@@ -1,0 +1,31 @@
+/*Navbar CSS*/
+
+.bg-navbar {
+    background-color:#488d7d;
+}
+
+.flex-search {
+    max-width: 400px;
+}
+
+.icon-web {
+    max-height: 40px;
+    margin-right: 5px;
+}
+
+.nav-link{
+    color: white;
+}
+
+.nav-link:hover{
+    color: white;
+}
+
+@media (max-width: 991px) {
+    .collapse-menu{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+    }
+}

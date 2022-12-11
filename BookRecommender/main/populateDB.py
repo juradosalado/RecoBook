@@ -26,7 +26,7 @@ def populateBooks():
             next(reader)
             i=0
             for row in reader:
-                if i<100:
+                if i<10:
                     isbn = row[7].strip()
                     title = row[1].strip()
                     series = row[2].strip()
