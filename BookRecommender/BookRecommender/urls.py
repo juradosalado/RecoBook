@@ -21,4 +21,5 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path('',views.index),
     path("populate/", views.populateDatabase),
+    path("recommend/", views.recommend),
 ]
