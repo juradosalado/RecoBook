@@ -7,6 +7,12 @@ from main.populateDB import populate
 
 # Create your views here.
 
+from django.template.defaulttags import register
+
+@register.filter
+def get_item(dictionary, key):
+    return dictionary[key]
+
 def index(request):
     return render(request, 'base_INDEX.html')
 
@@ -25,14 +31,16 @@ def recommend(request):
     author = Author.objects.get(name='Stephen King')
     authors = [author]
     reset_scores()
-    #add_age_score(21, 9)
+    add_age_score(21, 9)
     #add_genres_score(genres, 8)
     #add_setting_score(setting, 10)
     #add_pages_number_score(300, 5)
     #add_rating_score(4, 6)
-    add_author_score(author, 10)
+    #add_author_score(author, 10)
     #add_date_before_score(date_before, 4)
     #add_date_after_score(date_after, 4)
     #add_similar_authors_score(authors, 10)
     dictOrdered = dict(sorted(dictScores.items(), key=lambda item: -item[1]))
-    return render(request, 'base_RECOMMEND_FORM.html', {'dict': dictOrdered})
+    book = Book.objects.get(title="Cloud Atlas")
+    print(dictMatching)
+    return render(request, 'base_RECOMMEND_FORM.html', {'dict': dictOrdered, 'dict_matching': dictMatching, 'book':book})

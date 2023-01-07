@@ -6,7 +6,7 @@ from urllib.request import urlopen
 
 books = Book.objects.all()
 dictScores = dict()
-MATCHES_STRING = ""
+dictMatching = dict()
 
 preferred_genres_by_age=dict()
 
@@ -15,9 +15,21 @@ preferred_genres_by_age['18-35']= Genre.objects.filter(Q(name__icontains='Myster
 preferred_genres_by_age['36-70+']= Genre.objects.filter(Q(name__icontains='Mystery') | Q(name__icontains='Thriller') | Q(name__icontains='Crime') | Q(name__icontains='Biography') | Q(name__icontains='History') | Q(name__icontains='Historical'))
 def reset_scores():
     dictScores.clear()
-    MATCHES_STRING =""
+    dictMatching.clear()
 
 
+
+def matching_age_genre_text(genre, book):
+    # if book in dictMatching:
+    #     string = dictMatching[book]
+    #     if "Most popular genres by readers of your age: " not in string:
+    #         string+="Most popular genres by readers of your age: " + genre.name
+    #     else:
+    #         string+=", "+genre.name
+    # else:
+    #     string = "Most popular genres by readers of your age: " + genre.name
+    string = "Prueba"
+    dictMatching[book] = string
 
 def add_age_score(age, age_relevance):
     for book in books:
@@ -29,10 +41,7 @@ def add_age_score(age, age_relevance):
                         dictScores[book] += age_relevance / (len(preferred_genres_by_age['0-18'])*0.6)
                     else:
                         dictScores[book] = age_relevance / (len(preferred_genres_by_age['0-18'])*0.6)
-                        if "Most popular genres by readers of your age: " not in MATCHES_STRING:
-                            MATCHES_STRING+="Most popular genres by readers of your age: " + genre.name
-                        else:
-                            MATCHES_STRING+=", "+genre.name
+                    matching_age_genre_text(genre, book)
             #It tries not to recommend long books to young kids
             if age<=13 and book.pages_number>300:
                 if book in dictScores:
@@ -47,6 +56,7 @@ def add_age_score(age, age_relevance):
                         dictScores[book] += age_relevance / (len(preferred_genres_by_age['18-35'])*0.6)
                     else:
                         dictScores[book] = age_relevance / (len(preferred_genres_by_age['18-35'])*0.6)
+                    matching_age_genre_text(genre, book)
         else:
             for genre in preferred_genres_by_age['36-70+']:
                 if genre in book.genres.all():
@@ -54,6 +64,7 @@ def add_age_score(age, age_relevance):
                         dictScores[book] += age_relevance / (len(preferred_genres_by_age['36-70+'])*0.6)
                     else:
                         dictScores[book] = age_relevance / (len(preferred_genres_by_age['36-70+'])*0.6)
+                    matching_age_genre_text(genre, book)
 
 def add_genres_score(genres, genres_relevance):
     for book in books:
