@@ -7,25 +7,28 @@ from main.models import Author, Book, Genre, Setting
 
 def populate():
     (b, g, s, a)=populateBooks()
+    load_similar_books()
     return (b,g,s, a)
 
 def add_many_to_many(item_id, list_of_items, items_set, cls):
     items = []
     for item in list_of_items:
-        if item not in items_set:
-            items_set.add(item)
-            item=cls(item_id, item)
-            item.save()
+        print(item.strip())
+        if item.strip() not in items_set:
+            items_set.add(item.strip())
+            itemToAdd=cls(item_id, item.strip())
+            itemToAdd.save()
             item_id +=1
         else:
-            item=cls.objects.get(name=item)
-        items.append(item)
+            itemToAdd=cls.objects.get(name=item.strip())
+        items.append(itemToAdd)
     return items, item_id
 
 def populateBooks():
     Book.objects.all().delete()
     Genre.objects.all().delete()
     Setting.objects.all().delete()
+    Author.objects.all().delete()
 
     genres_set = set()
     genre_id = 0
@@ -41,7 +44,7 @@ def populateBooks():
             next(reader)
             book_id=0
             for row in reader:
-                if book_id<10:
+                if book_id<1000:
                     title = row[1].strip()
                     series = row[2].strip()
                     #Do not store books that are not first in a series. It has no sense to recommend them
@@ -51,7 +54,7 @@ def populateBooks():
                     num_ratings = int(row[17])
                     description = row[5].strip()
                     language = row[6].strip()
-                    pages_number = int(row[12].strip())
+                    pages_number = None if len(row[12].strip()) == 0 else int(row[12].strip())
                     publish_date = None if len(row[15].strip()) == 0 else datetime.strptime(row[15].strip(), '%m/%d/%y')
                     cover = row[21].strip()
 
@@ -78,3 +81,8 @@ def populateBooks():
     except FileNotFoundError:
         print("El archivo no existe")
         return (0,0,0)
+
+def load_similar_books():
+    #don't know if it will be efficient to calculate similarities between books
+    pass
+

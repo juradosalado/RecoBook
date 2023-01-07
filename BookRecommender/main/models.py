@@ -33,7 +33,7 @@ class Book(models.Model):
     description = models.TextField(verbose_name='Sinopsis')
     language = models.TextField(verbose_name='Idioma')
     genres = models.ManyToManyField(Genre)
-    pages_number = models.IntegerField(verbose_name='Número de páginas')
+    pages_number = models.IntegerField(verbose_name='Número de páginas', null=True)
     publish_date = models.DateField(verbose_name='Fecha de publicación', null=True)
     setting = models.ManyToManyField(Setting)
     cover = models.URLField(verbose_name='Portada')

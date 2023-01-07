@@ -7,7 +7,33 @@
 {% endblock %}
 
 {% block content %}
-<h1 class="title">Complete this form with your personal preferences to find a new book that fits you!</h1>
+<h1 class="title">This is what I found for you!</h1>
+
+<ul>
+    {% for k, v in dict.items %}
+        <li><h2>{{ k.title }}: {{ v }}</h2></li>
+        <img src={{ k.cover }}>
+        <p>Author: 
+            {% for author in k.author.all %}
+                {{ author.name }},
+            {% endfor %}
+        </p>
+        <p>Description: {{k.description}}</p>
+        
+        <p>Genres:
+            {% for genre in k.genres.all %}
+                {{ genre.name }}; 
+            {% endfor %}
+        </p>
+        <p>Number of pages: {{k.pages_number}}</p>
+        <p>Publish date: {{k.publish_date}}</p>
+        <p>Setting:
+            {% for setting in k.setting.all %}
+                {{ setting.name }}; 
+            {% endfor %}
+        </p>
+    {% endfor %}
+</ul>
 
 
 
