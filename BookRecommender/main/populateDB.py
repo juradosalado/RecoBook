@@ -13,7 +13,6 @@ def populate():
 def add_many_to_many(item_id, list_of_items, items_set, cls):
     items = []
     for item in list_of_items:
-        print(item.strip())
         if item.strip() not in items_set:
             items_set.add(item.strip())
             itemToAdd=cls(item_id, item.strip())
@@ -64,7 +63,7 @@ def populateBooks():
                     list_of_authors = row[3].strip().split(',')
                     list_of_authors = [re.sub(r"\(.*?\)", "", author.strip()) for author in list_of_authors]
                     authors, author_id = add_many_to_many(author_id, list_of_authors, authors_set, Author)
-                    book.author.set(authors)
+                    book.authors.set(authors)
 
                     list_of_genres = ast.literal_eval(row[8].strip())
                     genres, genre_id = add_many_to_many(genre_id, list_of_genres, genres_set, Genre)
@@ -79,7 +78,7 @@ def populateBooks():
             return (Book.objects.count(), Genre.objects.count(), Setting.objects.count(), Author.objects.count())
 
     except FileNotFoundError:
-        print("El archivo no existe")
+        print("File does not exist")
         return (0,0,0)
 
 def load_similar_books():

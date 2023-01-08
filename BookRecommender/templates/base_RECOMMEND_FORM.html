@@ -33,7 +33,16 @@
             {% endfor %}
         </p>
 
-        <p>{{ dict_matching.book }}</p>
+        {% for x, y in dict_matching.items %}
+            {% if k == x %}
+                <p>Matching:</p>
+                <ul>
+                {% for match in y %}
+                    <li>{{ match }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endfor %}
     {% endfor %}
 </ul>
 
