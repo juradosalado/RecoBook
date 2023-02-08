@@ -13,25 +13,6 @@
     {% for k, v in dict.items %}
         <li><h2>{{ k.title }}: {{ v }}</h2></li>
         <img src={{ k.cover }}>
-        <p>Author: 
-            {% for author in k.author.all %}
-                {{ author.name }},
-            {% endfor %}
-        </p>
-        <p>Description: {{k.description}}</p>
-        
-        <p>Genres:
-            {% for genre in k.genres.all %}
-                {{ genre.name }}; 
-            {% endfor %}
-        </p>
-        <p>Number of pages: {{k.pages_number}}</p>
-        <p>Publish date: {{k.publish_date}}</p>
-        <p>Setting:
-            {% for setting in k.setting.all %}
-                {{ setting.name }}; 
-            {% endfor %}
-        </p>
 
         {% for x, y in dict_matching.items %}
             {% if k == x %}
@@ -43,7 +24,10 @@
                 </ul>
             {% endif %}
         {% endfor %}
+        <a class="more-details-button"  href="{% url 'details' k.book_id %}">More Details</a>
     {% endfor %}
+    
+
 </ul>
 
 

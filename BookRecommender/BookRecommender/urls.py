@@ -22,4 +22,5 @@ urlpatterns = [
     path('',views.index),
     path("populate/", views.populateDatabase),
     path("recommend/", views.recommend),
+    path('details/<int:id>/', views.details, name='details'),
 ]

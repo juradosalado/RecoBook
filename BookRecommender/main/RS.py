@@ -120,9 +120,9 @@ def add_similar_authors_score(authors, similar_authors_relevance):
             for author in similar_authors:
                 if author in book.authors.all():
                     if book in dictScores:
-                        dictScores[book] += similar_authors_relevance
+                        dictScores[book] += similar_authors_relevance / authors.count()
                     else:
-                        dictScores[book] = similar_authors_relevance
+                        dictScores[book] = similar_authors_relevance / authors.count()
                     add_matching_text(author, book, matching_text= "Similar authors to the ones you were looking for: ")
 
 def add_setting_score(settings, setting_relevance):

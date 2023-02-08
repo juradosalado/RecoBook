@@ -19,7 +19,8 @@ def add_many_to_many(item_id, list_of_items, items_set, cls):
             itemToAdd.save()
             item_id +=1
         else:
-            itemToAdd=cls.objects.get(name=item.strip())
+            print(item.strip())
+            itemToAdd=cls.objects.filter(name=item.strip()).first()
         items.append(itemToAdd)
     return items, item_id
 
@@ -57,7 +58,7 @@ def populateBooks():
                     publish_date = None if len(row[15].strip()) == 0 else datetime.strptime(row[15].strip(), '%m/%d/%y')
                     cover = row[21].strip()
 
-                    book=Book(book_id=book_id, title=title, series=series, average_rating=average_rating, num_ratings=num_ratings,description=description, language=language, pages_number=pages_number, publish_date=publish_date, cover=cover)
+                    book=Book(book_id=book_id, title=title, average_rating=average_rating, num_ratings=num_ratings,description=description, pages_number=pages_number, publish_date=publish_date, cover=cover)
                     book.save()
 
                     list_of_authors = row[3].strip().split(',')
