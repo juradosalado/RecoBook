@@ -22,5 +22,6 @@ urlpatterns = [
     path('',views.index),
     path("populate/", views.populateDatabase),
     path("recommend/", views.recommend),
+    path('webhook/', views.webhook, name='webhook'),
     path('details/<int:id>/', views.details, name='details'),
 ]
