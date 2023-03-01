@@ -67,6 +67,24 @@ def webhook(request):
         response = userProvidesUserAge(parameters)
     if intent == 'UserProvidesUserAgeRelevance':
         response = userProvidesUserAgeRelevance(parameters)
+    if intent == 'UserProvidesGenres':
+        response = userProvidesGenres(parameters)
+    if intent == 'UserProvidesGenresRelevance':
+        response = userProvidesGenresRelevance(parameters)
+    if intent == 'UserProvidesAuthor':
+        response = userProvidesAuthor(parameters)
+    if intent == 'UserProvidesAuthorRelevance':
+        response = userProvidesAuthorRelevance(parameters)
+    if intent == 'UserProvidesSimilarAuthors2':
+        response = userProvidesSimilarAuthors(parameters)
+    if intent == 'UserProvidesSimilarAuthorsRelevance':
+        response = userProvidesSimilarAuthorsRelevance(parameters)
+    if intent == 'UserProvidesSetting':
+        response = userProvidesSetting(parameters)
+    if intent == 'UserProvidesSettingRelevance':
+        response = userProvidesSettingRelevance(parameters)
+
+    
     return JsonResponse(response)
 
 def userProvidesName(parameters):
@@ -83,21 +101,83 @@ dict_parameters = dict()
 
 def userProvidesUserAge(parameters):
     age = parameters['number-integer']
+    print("User age:"+str(age))
     dict_parameters['age'] = age
     response = {
     }
     return response
 
 def userProvidesUserAgeRelevance(parameters):
-    relevance = parameters['number-integer']
-    dict_parameters['ageRelevance'] = relevance
+    relevance = parameters['relevance']
+    dict_parameters['ageRelevance'] = int(relevance)
+    print("User age relevance: "+str(relevance))
     add_age_score(dict_parameters['age'], dict_parameters['ageRelevance'])
-    dict_ordered = dict(list(sorted(dictScores.items(), key=lambda item: (-item[1], -item[0].average_rating, item[0].num_ratings)))[:20])
-    text = "Here are the books I recommend you:" + str(dict_ordered)
-    print(text)
     response = {
-            'fulfillmentText': text
     }
-
     return response
 
+def userProvidesGenres(parameters):
+    genres_list = parameters['genre']
+    #Get all genres that contains the names in the list genres:
+    genres = Genre.objects.filter(Q(name__in=genres_list))
+    print("User genres: "+str(genres))
+    dict_parameters['genres'] = genres
+    response = {
+    }
+    return response
+
+def userProvidesGenresRelevance(parameters):
+    relevance = parameters['number-integer']
+    dict_parameters['genresRelevance'] = int(relevance)
+    print("User genres relevance: "+str(relevance))
+    add_genres_score(dict_parameters['genres'], dict_parameters['genresRelevance'])
+    dict_ordered = dict(list(sorted(dictScores.items(), key=lambda item: (-item[1], -item[0].average_rating, item[0].num_ratings)))[:20])
+    print(str(dict_ordered))
+    response = {
+    }
+    return response
+
+def userProvidesAuthor(parameters):
+    author_name = parameters['person']['name']
+    author = Author.objects.get(name=author_name)
+    print("User author: "+str(author))
+    dict_parameters['author'] = author
+    response = {'fulfillmentText': "From one to ten, how much importance do you want the fact that a book is written by " + author_name+" to have in your book recommendation"
+    }
+    return response
+
+def userProvidesAuthorRelevance(parameters):
+    relevance = parameters['relevance']
+    dict_parameters['authorRelevance'] = float(relevance)
+    print("User author relevance: "+str(relevance))
+    #print type of dict_parameters['auhtorRelevance']:
+    print(type(dict_parameters['authorRelevance']))
+    add_author_score(dict_parameters['author'], dict_parameters['authorRelevance'])
+    dict_ordered = dict(list(sorted(dictScores.items(), key=lambda item: (-item[1], -item[0].average_rating, item[0].num_ratings)))[:20])
+    print(str(dict_ordered))
+    response = {
+    }
+    return response
+
+def userProvidesSimilarAuthors(parameters):
+    authors_list = parameters
+    #get the names of authors:
+    authors_list = [name['name'] for name in authors_list['person']]
+    authors = Author.objects.filter(Q(name__in=authors_list))
+    print("User similar authors: "+str(authors))
+    dict_parameters['similarAuthors'] = authors
+    response = {
+    }
+    return response
+
+def userProvidesSimilarAuthorsRelevance(parameters):
+    relevance = parameters['number-integer']
+    dict_parameters['similarAuthorsRelevance'] = int(relevance)
+    print("User similar authors relevance: "+str(relevance))
+    print(dict_parameters)
+    add_similar_authors_score(dict_parameters['similarAuthors'], dict_parameters['similarAuthorsRelevance'])
+    dict_ordered = dict(list(sorted(dictScores.items(), key=lambda item: (-item[1], -item[0].average_rating, item[0].num_ratings)))[:20])
+    print(str(dict_ordered))
+    response = {
+    }
+    return response
