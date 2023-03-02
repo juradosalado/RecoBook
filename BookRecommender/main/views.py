@@ -2,6 +2,7 @@ import datetime
 from django.shortcuts import render
 from main.RS import *
 from main.models import Author, Setting
+from datetime import datetime
 
 import json
 from django.http import JsonResponse
@@ -37,13 +38,18 @@ def recommend(request):
     add_genres_score(genres, 10)
     add_author_score(author, 2)
     # add_similar_authors_score(authors, 6)
-    #add_setting_score(setting, 5)
+    #add_settings_score(setting, 5)
     add_pages_number_score(500, 5)
     add_rating_score(4, 10)
     add_date_score(date_after, date_before, 4)
     #it will order books first by score. Then, ties result will be ordered by rating.
     #Finally, ties result will be ordered by number of ratings (first the ones with less number of ratings)
     dict_ordered = dict(list(sorted(dictScores.items(), key=lambda item: (-item[1], -item[0].average_rating, item[0].num_ratings)))[:20])
+    return render(request, 'base_RECOMMEND_FORM.html', {'dict': dict_ordered, 'dict_matching': dictMatching})
+
+def showResults(request):
+    dict_ordered = dict(list(sorted(dictScores.items(), key=lambda item: (-item[1], -item[0].average_rating, item[0].num_ratings)))[:20])
+    print(dict_ordered)
     return render(request, 'base_RECOMMEND_FORM.html', {'dict': dict_ordered, 'dict_matching': dictMatching})
 
 def details(request,id):
@@ -79,17 +85,33 @@ def webhook(request):
         response = userProvidesSimilarAuthors(parameters)
     if intent == 'UserProvidesSimilarAuthorsRelevance':
         response = userProvidesSimilarAuthorsRelevance(parameters)
-    if intent == 'UserProvidesSetting':
-        response = userProvidesSetting(parameters)
-    if intent == 'UserProvidesSettingRelevance':
-        response = userProvidesSettingRelevance(parameters)
+    if intent == 'UserProvidesSettings':
+        response = userProvidesSettings(parameters)
+    if intent == 'UserProvidesSettingsRelevance':
+        response = userProvidesSettingsRelevance(parameters)
+    if intent == 'UserProvidesPages':
+        response = userProvidesPages(parameters)
+    if intent == 'UserProvidesPagesRelevance':
+        response = userProvidesPagesRelevance(parameters)
+    if intent == 'UserProvidesRate':
+        response = userProvidesRate(parameters)
+    if intent == 'UserProvidesRateRelevance':
+        response = userProvidesRateRelevance(parameters)
+    if intent == 'UserProvidesDate':
+        response = userProvidesDate(parameters)
+    if intent == 'UserProvidesDateRelevance':
+        response = userProvidesDateRelevance(parameters)
+
 
     
     return JsonResponse(response)
 
+dict_parameters = dict()
+
 def userProvidesName(parameters):
     reset_scores()
     name = parameters['person']['name']
+    dict_parameters['userName'] = name
     text = "Nice to meet you, " +name+"! Let's start with the questions that will help me find you a new book to read. How old are you? It is important for you to know that, for every question I ask you, you do not have to answer me if you don't want to, or just don't care about it. In that case, just let me know you would rather not to response."
     print(text)
     response = {
@@ -97,7 +119,7 @@ def userProvidesName(parameters):
         }
     return response
 
-dict_parameters = dict()
+
 
 def userProvidesUserAge(parameters):
     age = parameters['number-integer']
@@ -162,8 +184,11 @@ def userProvidesAuthorRelevance(parameters):
 def userProvidesSimilarAuthors(parameters):
     authors_list = parameters
     #get the names of authors:
-    authors_list = [name['name'] for name in authors_list['person']]
-    authors = Author.objects.filter(Q(name__in=authors_list))
+    query = Q()
+    for author in authors_list['person']:
+        query |= Q(name__icontains=author['name'])
+    authors = Author.objects.filter(query)
+
     print("User similar authors: "+str(authors))
     dict_parameters['similarAuthors'] = authors
     response = {
@@ -181,3 +206,106 @@ def userProvidesSimilarAuthorsRelevance(parameters):
     response = {
     }
     return response
+
+def userProvidesSettings(parameters):
+    setting_list = parameters['settings']
+    #Get all settings that contains the names in the list settings:
+    #not name == setting, but name like setting
+
+    query = Q()
+    for setting in setting_list:
+        query |= Q(name__icontains=setting)
+    settings = Setting.objects.filter(query)
+    print("User settings: "+str(settings))
+    dict_parameters['settings'] = settings
+    response = {
+    }
+    return response
+
+def userProvidesSettingsRelevance(parameters):
+    name = dict_parameters['userName']
+    print(name)
+    relevance = parameters['number-integer']
+    dict_parameters['settingsRelevance'] = int(relevance)
+    print("User settings relevance: "+str(relevance))
+    add_settings_score(dict_parameters['settings'], dict_parameters['settingsRelevance'])
+    dict_ordered = dict(list(sorted(dictScores.items(), key=lambda item: (-item[1], -item[0].average_rating, item[0].num_ratings)))[:20])
+    print(str(dict_ordered))
+    response = {
+        'fulfillmentText': "I know sometimes a book length can be an important fact for readers... What would be the maximum amount of pages that you would like to find in your next read? Again, you can let me know that you don't care about this if that's the case, don't be shy,"+ name+"!"
+    }
+    return response
+
+def userProvidesPages(parameters):
+    pages = parameters['number-integer']
+    print("User pages: "+str(pages))
+    dict_parameters['pages'] = pages
+    response = {
+    }
+    return response
+
+def userProvidesPagesRelevance(parameters):
+    relevance = parameters['number-integer']
+    dict_parameters['pagesRelevance'] = int(relevance)
+    print("User pages relevance: "+str(relevance))
+    add_pages_number_score(dict_parameters['pages'], dict_parameters['pagesRelevance'])
+    dict_ordered = dict(list(sorted(dictScores.items(), key=lambda item: (-item[1], -item[0].average_rating, item[0].num_ratings)))[:20])
+    print(str(dict_ordered))
+    response = {
+    }
+    return response
+
+def userProvidesRate(parameters):
+    rating = parameters['number']
+    print("User rating: "+str(rating))
+    dict_parameters['rating'] = float(rating)
+    response = {
+    }
+    return response
+
+def userProvidesRateRelevance(parameters):
+    relevance = parameters['number-integer']
+    dict_parameters['ratingRelevance'] = int(relevance)
+    print("User rating relevance: "+str(relevance))
+    add_rating_score(dict_parameters['rating'], dict_parameters['ratingRelevance'])
+    dict_ordered = dict(list(sorted(dictScores.items(), key=lambda item: (-item[1], -item[0].average_rating, item[0].num_ratings)))[:20])
+    print(str(dict_ordered))
+    response = {
+    }
+    return response
+
+def userProvidesDate(parameters):
+    date = parameters['date']
+    dateAfter = datetime.fromisoformat(date[0]).date()
+    dateBefore = datetime.fromisoformat(date[1]).date()
+    #print type of date:
+    print(type(date))
+    print("User date: "+str(date))
+    dict_parameters['dateAfter'] = dateAfter
+    dict_parameters['dateBefore'] = dateBefore
+    response = {
+    }
+    return response
+
+def userProvidesDateRelevance(parameters):
+    relevance = parameters['number-integer']
+    dict_parameters['dateRelevance'] = int(relevance)
+    print("User date relevance: "+str(relevance))
+    add_date_score(dict_parameters['dateAfter'], dict_parameters['dateBefore'], dict_parameters['dateRelevance'])
+    dict_ordered = dict(list(sorted(dictScores.items(), key=lambda item: (-item[1], -item[0].average_rating, item[0].num_ratings)))[:20])
+    print(str(dict_ordered))
+    response = {
+    }
+    return response
+
+#TODO:
+#limitar relevancias entre 1 y 10
+#rating que no se salga de 1 y 5
+#eliminar relevance
+#Mensaje de formato de fechas
+#boton que redirija a resultados.
+#Refactorizar
+
+
+
+

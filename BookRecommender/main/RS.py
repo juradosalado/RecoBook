@@ -124,7 +124,7 @@ def add_similar_authors_score(authors, similar_authors_relevance):
                         dictScores[book] = similar_authors_relevance / len(authors)
                     add_matching_text(author, book, matching_text= "Similar authors to the ones you were looking for: ")
 
-def add_setting_score(settings, setting_relevance):
+def add_settings_score(settings, setting_relevance):
     for book in books:
         for setting in settings:
             if setting in book.setting.all():
