@@ -1,5 +1,5 @@
 import datetime
-from main.models import Author, Book, Genre, Setting
+from main.models import Author, Book, Genre, Setting, UserSession
 from django.db.models import Q
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
@@ -45,6 +45,7 @@ def add_matching_text(element, book, matching_text):
 
 
 def add_age_score(user_session):
+    session_id = user_session.session_id
     age = user_session.age
     age_relevance = int(user_session.age_relevance)
     matching_text = "Most popular genres by readers of your age: "
@@ -89,8 +90,12 @@ def add_age_score(user_session):
                         dictScores[user_session] = dict()
                         dictScores[user_session][book] = age_relevance / len(preferred_genres_by_age['36-70+'])
                     add_matching_text(genre, book, matching_text)
+    user_session = UserSession.objects.get(session_id=session_id)
+    user_session.is_waiting = False
+    user_session.save()
 
 def add_genres_score(user_session):
+    session_id = user_session.session_id
     genres = user_session.genres.all()
 
     genres_relevance = int(user_session.genres_relevance)
@@ -107,12 +112,16 @@ def add_genres_score(user_session):
                     dictScores[user_session] = dict()
                     dictScores[user_session][book] = genres_relevance / len(genres)
                 add_matching_text(genre, book, matching_text= "Genres you were looking for: ")
-                
+    user_session = UserSession.objects.get(session_id=session_id)
+    user_session.is_waiting = False
+    user_session.save()            
 
 def add_author_score(user_session):
+    session_id = user_session.session_id
     author_name = user_session.author_name
+    print(author_name)
     #it will always find an author, because it wouldn't call the function if it doesn't
-    author = Author.objects.filter(name__icontains=author_name).first()
+    author = Author.objects.get(name=author_name)
     author_relevance = int(user_session.author_relevance)
 
     for book in books:
@@ -126,8 +135,12 @@ def add_author_score(user_session):
                 dictScores[user_session] = dict()
                 dictScores[user_session][book] = author_relevance
             add_matching_text(author, book, matching_text= "Author you were looking for: ")
+    user_session = UserSession.objects.get(session_id=session_id)
+    user_session.is_waiting = False
+    user_session.save()
 
 def add_similar_authors_score(user_session):
+    session_id = user_session.session_id
     authors = user_session.similar_authors.all()
     similar_authors_relevance = int(user_session.similar_authors_relevance)
     base_url = "https://www.literature-map.com/"
@@ -158,27 +171,38 @@ def add_similar_authors_score(user_session):
                         dictScores[user_session] = dict()
                         dictScores[user_session][book] = similar_authors_relevance / len(authors)
                     add_matching_text(author, book, matching_text= "Similar authors to the ones you were looking for: ")
+    user_session = UserSession.objects.get(session_id=session_id)
+    user_session.is_waiting = False
+    user_session.save()
 
 def add_settings_score(user_session):
+    session_id = user_session.session_id
     settings = user_session.settings.all()
-    setting_relevance = int(user_session.setting_relevance)
+    settings_relevance = int(user_session.settings_relevance)
     for book in books:
         for setting in settings:
             if setting in book.setting.all():
                 if user_session in dictScores:
                     if book in dictScores[user_session]:
-                        dictScores[user_session][book] += setting_relevance
+                        dictScores[user_session][book] += settings_relevance
                     else:
-                        dictScores[user_session][book] = setting_relevance
+                        dictScores[user_session][book] = settings_relevance
                 else:
                     dictScores[user_session] = dict()
-                    dictScores[user_session][book] = setting_relevance
+                    dictScores[user_session][book] = settings_relevance
                 add_matching_text(setting, book, matching_text= "Setting you were looking for: ")
                 #It will only check that one of your settings is in the book, so it doesn't count twice settings like:
                 #'Ireland' and 'Dublin, Ireland'
+                user_session = UserSession.objects.get(session_id=session_id)
+                user_session.is_waiting = False
+                user_session.save()
                 break
+    user_session = UserSession.objects.get(session_id=session_id)
+    user_session.is_waiting = False
+    user_session.save()
 
 def add_pages_number_score(user_session):
+    session_id = user_session.session_id
     pages_number =  user_session.pages_number
     pages_number_relevance = int(user_session.pages_number_relevance)
     for book in books:
@@ -202,6 +226,9 @@ def add_pages_number_score(user_session):
                 else:
                     dictScores[user_session] = dict()
                     dictScores[user_session][book] = -(book.pages_number - pages_number) * pages_number_relevance /300
+    user_session = UserSession.objects.get(session_id=session_id)
+    user_session.is_waiting = False
+    user_session.save()
 
 def add_date_score(user_session):
     date_after = user_session.date_after
@@ -238,6 +265,8 @@ def add_date_score(user_session):
                 else:
                     dictScores[user_session] = dict()
                     dictScores[user_session][book] = -(date_after - book.publish_date).days * date_relevance / 365*3
+    user_session.is_waiting = False
+    user_session.save()
 
 
 
@@ -295,5 +324,7 @@ def add_rating_score(user_session):
                 else:
                     dictScores[user_session] = dict()
                     dictScores[user_session][book] = -(rating - float(book.average_rating)) * rating_relevance
+    user_session.is_waiting = False
+    user_session.save()
 
 

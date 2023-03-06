@@ -45,7 +45,7 @@ class UserSession(models.Model):
     age_relevance = models.IntegerField(verbose_name='Relevancia de la edad',null=True)
     genres = models.ManyToManyField(Genre,null=True)
     genres_relevance = models.IntegerField(null=True)
-    auhtor_name = models.TextField(null=True)
+    author_name = models.TextField(null=True)
     author_relevance = models.IntegerField(verbose_name='Relevancia del autor',null=True)
     similar_authors = models.ManyToManyField(Author, null=True)
     similar_authors_relevance = models.IntegerField(verbose_name='Relevancia de los autores similares', null=True)
@@ -58,6 +58,7 @@ class UserSession(models.Model):
     date_before = models.DateField(verbose_name="Fecha anterior", null=True)
     date_after = models.DateField(verbose_name="Fecha posterior",null=True)
     date_relevance = models.IntegerField(verbose_name='Relevancia de la fecha', null=True)
+    is_waiting = models.BooleanField(default=False)
 
 
 

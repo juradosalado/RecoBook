@@ -2,7 +2,8 @@
 
 from main.RS import *
 import time
-waiting = True
+
+from main.models import UserSession
 def userProvidesName(parameters, user_session):
     session_id = user_session.session_id
     reset_scores(user_session)
@@ -24,6 +25,7 @@ def userProvidesUserAge(parameters, user_session):
     print(user_session.name)
     session_id = user_session.session_id
     age = parameters['number-integer']
+    user_session = UserSession.objects.get(session_id=session_id)
     user_session.age = age
     user_session.save()
     print("User age:"+str(age))
@@ -35,12 +37,12 @@ def userProvidesUserAge(parameters, user_session):
 def userProvidesUserAgeRelevance(parameters, user_session):
     relevance = parameters['relevance']
     session_id = user_session.session_id
+    user_session = UserSession.objects.get(session_id=session_id)
     user_session.age_relevance = relevance
-    user_session.save()
     print("User age relevance: "+str(relevance))
-    waiting = True
+    user_session.is_waiting = True
+    user_session.save()
     add_age_score(user_session)
-    waiting = False
     response = {
         'session': session_id
     }
@@ -49,9 +51,11 @@ def userProvidesUserAgeRelevance(parameters, user_session):
     return response
 
 def userProvidesGenres(parameters, user_session):
+    session_id = user_session.session_id
     genres_list = parameters['genre']
     #Get all genres that contains the names in the list genres:
     genres = Genre.objects.filter(Q(name__in=genres_list))
+    user_session = UserSession.objects.get(session_id=session_id)
     user_session.genres.set(genres)
     user_session.save()
     print("User genres: "+str(genres))
@@ -62,15 +66,20 @@ def userProvidesGenres(parameters, user_session):
     return response
 
 def userProvidesGenresRelevance(parameters, user_session):
+    session_id = user_session.session_id
     print("Entré")
     relevance = parameters['number-integer']
+    user_session = UserSession.objects.get(session_id=session_id)
     user_session.genres_relevance = int(relevance)
     user_session.save()
     print("User genres relevance: "+str(relevance))
+    waiting = user_session.is_waiting
     while(waiting):
-        print("Waiting")
         time.sleep(3)
-
+        user_session = UserSession.objects.get(session_id=session_id)
+        waiting = user_session.is_waiting
+    user_session.is_waiting = True
+    user_session.save()
     add_genres_score(user_session)
     dict_ordered = dict(list(sorted(dictScores[user_session].items(), key=lambda item: (-item[1], -item[0].average_rating, item[0].num_ratings)))[:20])
     print(str(dict_ordered))
@@ -80,51 +89,84 @@ def userProvidesGenresRelevance(parameters, user_session):
     return response
 
 def userProvidesAuthor(parameters, user_session):
+    session_id = user_session.session_id
     author_name = parameters['person']['name']
-    author = Author.objects.get(name=author_name)
-    print("User author: "+str(author))
-    dict_parameters['author'] = author
+    print(author_name)
+    author = Author.objects.filter(name__icontains=author_name)
+    print(author[0])
+    #check that author contains any object:
+    user_session = UserSession.objects.get(session_id=session_id)
+    if author:
+        user_session.author_name = str(author[0])
+    else:
+        user_session.author_name = None
+    user_session.save()
+    print(user_session.author_name)
+
     response = {'fulfillmentText': "From one to ten, how much importance do you want the fact that a book is written by " + author_name+" to have in your book recommendation",
         'session': user_session.session_id
     }
     return response
 
 def userProvidesAuthorRelevance(parameters, user_session):
+    session_id = user_session.session_id
     relevance = parameters['relevance']
-    dict_parameters['authorRelevance'] = float(relevance)
-    print("User author relevance: "+str(relevance))
-    #print type of dict_parameters['auhtorRelevance']:
-    print(type(dict_parameters['authorRelevance']))
-    add_author_score(dict_parameters['author'], dict_parameters['authorRelevance'])
-    dict_ordered = dict(list(sorted(dictScores.items(), key=lambda item: (-item[1], -item[0].average_rating, item[0].num_ratings)))[:20])
+    user_session = UserSession.objects.get(session_id=session_id)
+    user_session.author_relevance = int(relevance)
+    print(user_session.author_name)
+    user_session.save()
+    if user_session.author_name is not None:
+        print("Voy a puntuar el autor:")
+        waiting = user_session.is_waiting
+        while(waiting):
+            user_session = UserSession.objects.get(session_id=session_id)
+            waiting = user_session.is_waiting
+            time.sleep(3)
+        user_session = UserSession.objects.get(session_id=session_id)
+        user_session.is_waiting = True
+        user_session.save()
+        add_author_score(user_session)
+    dict_ordered = dict(list(sorted(dictScores[user_session].items(), key=lambda item: (-item[1], -item[0].average_rating, item[0].num_ratings)))[:20])
     print(str(dict_ordered))
     response = {
-        'session': user_session.session_id
+        'session': session_id
     }
     return response
 
 def userProvidesSimilarAuthors(parameters, user_session):
+    session_id = user_session.session_id
     authors_list = parameters
     #get the names of authors:
     query = Q()
     for author in authors_list['person']:
         query |= Q(name__icontains=author['name'])
     authors = Author.objects.filter(query)
-
+    user_session = UserSession.objects.get(session_id=session_id)
+    user_session.similar_authors.set(authors)
+    user_session.save()
     print("User similar authors: "+str(authors))
-    dict_parameters['similarAuthors'] = authors
+
     response = {
-        'session': user_session.session_id
+        'session': session_id
     }
     return response
 
 def userProvidesSimilarAuthorsRelevance(parameters, user_session):
+    session_id = user_session.session_id
     relevance = parameters['number-integer']
-    dict_parameters['similarAuthorsRelevance'] = int(relevance)
     print("User similar authors relevance: "+str(relevance))
-    print(dict_parameters)
-    add_similar_authors_score(dict_parameters['similarAuthors'], dict_parameters['similarAuthorsRelevance'])
-    dict_ordered = dict(list(sorted(dictScores.items(), key=lambda item: (-item[1], -item[0].average_rating, item[0].num_ratings)))[:20])
+    user_session = UserSession.objects.get(session_id=session_id)
+    user_session.similar_authors_relevance = int(relevance)
+    user_session.save()
+    waiting = user_session.is_waiting
+    while(waiting):
+        time.sleep(3)
+        user_session = UserSession.objects.get(session_id=session_id)
+        waiting = user_session.is_waiting
+    user_session.is_waiting = True
+    user_session.save()
+    add_similar_authors_score(user_session)
+    dict_ordered = dict(list(sorted(dictScores[user_session].items(), key=lambda item: (-item[1], -item[0].average_rating, item[0].num_ratings)))[:20])
     print(str(dict_ordered))
     response = {
         'session': user_session.session_id
@@ -132,6 +174,7 @@ def userProvidesSimilarAuthorsRelevance(parameters, user_session):
     return response
 
 def userProvidesSettings(parameters, user_session):
+    session_id = user_session.session_id
     setting_list = parameters['settings']
     #Get all settings that contains the names in the list settings:
     #not name == setting, but name like setting
@@ -141,42 +184,59 @@ def userProvidesSettings(parameters, user_session):
         query |= Q(name__icontains=setting)
     settings = Setting.objects.filter(query)
     print("User settings: "+str(settings))
-    dict_parameters['settings'] = settings
+    user_session = UserSession.objects.get(session_id=session_id)
+    user_session.settings.set(settings)
+    user_session.save()
     response = {
         'session': user_session.session_id
     }
     return response
-
+#TESTEAR QUE FUNCIONA
 def userProvidesSettingsRelevance(parameters, user_session):
-    name = dict_parameters['userName']
-    print(name)
+    session_id = user_session.session_id
     relevance = parameters['number-integer']
-    dict_parameters['settingsRelevance'] = int(relevance)
+    user_session = UserSession.objects.get(session_id=session_id)
+    waiting = user_session.is_waiting
+    while(waiting):
+        time.sleep(3)
+        user_session = UserSession.objects.get(session_id=session_id)
+        waiting = user_session.is_waiting
+    user_session.settings_relevance = int(relevance)
+    user_session.is_waiting = True
+    user_session.save()
+    add_settings_score(user_session)
     print("User settings relevance: "+str(relevance))
-    add_settings_score(dict_parameters['settings'], dict_parameters['settingsRelevance'])
-    dict_ordered = dict(list(sorted(dictScores.items(), key=lambda item: (-item[1], -item[0].average_rating, item[0].num_ratings)))[:20])
+    dict_ordered = dict(list(sorted(dictScores[user_session].items(), key=lambda item: (-item[1], -item[0].average_rating, item[0].num_ratings)))[:20])
     print(str(dict_ordered))
     response = {
-        'fulfillmentText': "I know sometimes a book length can be an important fact for readers... What would be the maximum amount of pages that you would like to find in your next read? Again, you can let me know that you don't care about this if that's the case, don't be shy,"+ name+"!",
         'session': user_session.session_id
     }
     return response
 
 def userProvidesPages(parameters, user_session):
+    session_id = user_session.session_id
     pages = parameters['number-integer']
     print("User pages: "+str(pages))
-    dict_parameters['pages'] = pages
+    user_session = UserSession.objects.get(session_id=session_id)
+    user_session.pages = int(pages)
     response = {
         'session': user_session.session_id
     }
     return response
 
 def userProvidesPagesRelevance(parameters, user_session):
+    session_id = user_session.session_id
     relevance = parameters['number-integer']
-    dict_parameters['pagesRelevance'] = int(relevance)
-    print("User pages relevance: "+str(relevance))
-    add_pages_number_score(dict_parameters['pages'], dict_parameters['pagesRelevance'])
-    dict_ordered = dict(list(sorted(dictScores.items(), key=lambda item: (-item[1], -item[0].average_rating, item[0].num_ratings)))[:20])
+    waiting = user_session.is_waiting
+    while(waiting):
+        time.sleep(3)
+        user_session = UserSession.objects.get(session_id=session_id)
+        waiting = user_session.is_waiting
+    user_session.is_waiting = True
+    user_session.pages_relevance = int(relevance)
+    user_session.save()
+    add_pages_number_score(user_session)
+    dict_ordered = dict(list(sorted(dictScores[user_session].items(), key=lambda item: (-item[1], -item[0].average_rating, item[0].num_ratings)))[:20])
     print(str(dict_ordered))
     response = {
         'session': user_session.session_id

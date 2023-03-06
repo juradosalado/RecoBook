@@ -145,6 +145,7 @@ def webhook(request):
 #Mensaje de formato de fechas
 #boton que redirija a resultados.
 #que avise
+#que london no sea una persona xd (o que no llegue el context de autor aquí)
 #Refactorizar
 
 
