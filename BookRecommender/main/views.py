@@ -57,10 +57,11 @@ def recommend(request):
     return render(request, 'base_RECOMMEND_FORM.html', {'dict': dict_ordered, 'dict_matching': dictMatching})
 
 def showResults(request):
-
-    dict_ordered = dict(list(sorted(dictScores.items(), key=lambda item: (-item[1], -item[0].average_rating, item[0].num_ratings)))[:20])
+    session_id = request.GET.get('session')
+    user_session = UserSession.objects.get(session_id=session_id)
+    dict_ordered = dict(list(sorted(dictScores[user_session].items(), key=lambda item: (-item[1], -item[0].average_rating, item[0].num_ratings)))[:20])
     print(dict_ordered)
-    return render(request, 'base_RECOMMEND_FORM.html', {'dict': dict_ordered, 'dict_matching': dictMatching})
+    return render(request, 'base_RECOMMEND_FORM.html', {'dict': dict_ordered, 'dict_matching': dictMatching[user_session]})
 
 def details(request,id):
     book = Book.objects.get(book_id=id)
@@ -102,7 +103,7 @@ def webhook(request):
     if intent == 'UserProvidesUserAge':
         response = userProvidesUserAge(parameters, user_session)
     if intent == 'UserProvidesUserAgeRelevance':
-        response = userProvidesUserAgeRelevance(parameters, user_session)
+        response = userProvidesUserAgeRelevance(parameters, user_session, intent)
     if intent == 'UserProvidesGenres':
         response = userProvidesGenres(parameters, user_session)
     if intent == 'UserProvidesGenresRelevance':
@@ -141,13 +142,11 @@ def webhook(request):
 #TODO:
 #limitar relevancias entre 1 y 10
 #rating que no se salga de 1 y 5
-#eliminar relevance
-#Mensaje de formato de fechas
-#boton que redirija a resultados.
-#que avise
 #que london no sea una persona xd (o que no llegue el context de autor aquí)
 #Refactorizar
-
+#unificar atributos: rate, rating y demas
+#checkear q funciona bien el entrenamiento de userprovidesuseragerelevance
+#Controlar el borrado de los dicts y de las entidades al pasar cierto tiempo (24 horas o limitarlo a numero de instancias)
 
 
 

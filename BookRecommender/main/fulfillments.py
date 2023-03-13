@@ -4,6 +4,20 @@ from main.RS import *
 import time
 
 from main.models import UserSession
+
+def isRelevanceValid(relevance, user_session):
+    print("No es valido colega")
+    if int(relevance) <=0 or int(relevance) >10:
+        response={
+            'fulfillmentText': "Oops. I need your relevance degree to be a number between 1 and 10. Please, respond with a number between 1 and 10",
+            'session': user_session.session_id
+
+        }
+        return False, response
+    else:
+        return True, {}
+
+
 def userProvidesName(parameters, user_session):
     session_id = user_session.session_id
     reset_scores(user_session)
@@ -34,8 +48,11 @@ def userProvidesUserAge(parameters, user_session):
     }
     return response
 
-def userProvidesUserAgeRelevance(parameters, user_session):
-    relevance = parameters['relevance']
+def userProvidesUserAgeRelevance(parameters, user_session, intent):
+    relevance = parameters['number-integer']
+    isRelValid, response = isRelevanceValid(relevance, user_session)
+    if not isRelValid:
+        return response
     session_id = user_session.session_id
     user_session = UserSession.objects.get(session_id=session_id)
     user_session.age_relevance = relevance
@@ -67,8 +84,11 @@ def userProvidesGenres(parameters, user_session):
 
 def userProvidesGenresRelevance(parameters, user_session):
     session_id = user_session.session_id
-    print("Entré")
     relevance = parameters['number-integer']
+    isRelValid, response = isRelevanceValid(relevance, user_session)
+    if not isRelValid:
+        return response
+    print("Entré")
     user_session = UserSession.objects.get(session_id=session_id)
     user_session.genres_relevance = int(relevance)
     user_session.save()
@@ -110,7 +130,10 @@ def userProvidesAuthor(parameters, user_session):
 
 def userProvidesAuthorRelevance(parameters, user_session):
     session_id = user_session.session_id
-    relevance = parameters['relevance']
+    relevance = parameters['number-integer']
+    isRelValid, response = isRelevanceValid(relevance, user_session)
+    if not isRelValid:
+        return response
     user_session = UserSession.objects.get(session_id=session_id)
     user_session.author_relevance = int(relevance)
     print(user_session.author_name)
@@ -154,6 +177,9 @@ def userProvidesSimilarAuthors(parameters, user_session):
 def userProvidesSimilarAuthorsRelevance(parameters, user_session):
     session_id = user_session.session_id
     relevance = parameters['number-integer']
+    isRelValid, response = isRelevanceValid(relevance, user_session)
+    if not isRelValid:
+        return response
     print("User similar authors relevance: "+str(relevance))
     user_session = UserSession.objects.get(session_id=session_id)
     user_session.similar_authors_relevance = int(relevance)
@@ -191,10 +217,13 @@ def userProvidesSettings(parameters, user_session):
         'session': user_session.session_id
     }
     return response
-#TESTEAR QUE FUNCIONA
+
 def userProvidesSettingsRelevance(parameters, user_session):
     session_id = user_session.session_id
     relevance = parameters['number-integer']
+    isRelValid, response = isRelevanceValid(relevance, user_session)
+    if not isRelValid:
+        return response
     user_session = UserSession.objects.get(session_id=session_id)
     waiting = user_session.is_waiting
     while(waiting):
@@ -218,7 +247,8 @@ def userProvidesPages(parameters, user_session):
     pages = parameters['number-integer']
     print("User pages: "+str(pages))
     user_session = UserSession.objects.get(session_id=session_id)
-    user_session.pages = int(pages)
+    user_session.pages_number = int(pages)
+    user_session.save()
     response = {
         'session': user_session.session_id
     }
@@ -227,13 +257,16 @@ def userProvidesPages(parameters, user_session):
 def userProvidesPagesRelevance(parameters, user_session):
     session_id = user_session.session_id
     relevance = parameters['number-integer']
+    isRelValid, response = isRelevanceValid(relevance, user_session)
+    if not isRelValid:
+        return response
     waiting = user_session.is_waiting
     while(waiting):
         time.sleep(3)
         user_session = UserSession.objects.get(session_id=session_id)
         waiting = user_session.is_waiting
     user_session.is_waiting = True
-    user_session.pages_relevance = int(relevance)
+    user_session.pages_number_relevance = int(relevance)
     user_session.save()
     add_pages_number_score(user_session)
     dict_ordered = dict(list(sorted(dictScores[user_session].items(), key=lambda item: (-item[1], -item[0].average_rating, item[0].num_ratings)))[:20])
@@ -244,20 +277,33 @@ def userProvidesPagesRelevance(parameters, user_session):
     return response
 
 def userProvidesRate(parameters, user_session):
-    rating = parameters['number']
-    print("User rating: "+str(rating))
-    dict_parameters['rating'] = float(rating)
+    session_id = user_session.session_id
+    rate = parameters["number"]
+    print("User rate: "+str(rate))
+    user_session = UserSession.objects.get(session_id=session_id)
+    user_session.rating = float(rate)
+    user_session.save()
     response = {
         'session': user_session.session_id
     }
     return response
 
 def userProvidesRateRelevance(parameters, user_session):
+    session_id = user_session.session_id
     relevance = parameters['number-integer']
-    dict_parameters['ratingRelevance'] = int(relevance)
-    print("User rating relevance: "+str(relevance))
-    add_rating_score(dict_parameters['rating'], dict_parameters['ratingRelevance'])
-    dict_ordered = dict(list(sorted(dictScores.items(), key=lambda item: (-item[1], -item[0].average_rating, item[0].num_ratings)))[:20])
+    isRelValid, response = isRelevanceValid(relevance, user_session)
+    if not isRelValid:
+        return response
+    waiting = user_session.is_waiting
+    while(waiting):
+        time.sleep(3)
+        user_session = UserSession.objects.get(session_id=session_id)
+        waiting = user_session.is_waiting
+    user_session.is_waiting = True
+    user_session.rating_relevance = int(relevance)
+    user_session.save()
+    add_rating_score(user_session)
+    dict_ordered = dict(list(sorted(dictScores[user_session].items(), key=lambda item: (-item[1], -item[0].average_rating, item[0].num_ratings)))[:20])
     print(str(dict_ordered))
     response = {
         'session': user_session.session_id
@@ -265,27 +311,42 @@ def userProvidesRateRelevance(parameters, user_session):
     return response
 
 def userProvidesDate(parameters, user_session):
+    session_id = user_session.session_id
     date = parameters['date']
-    dateAfter = datetime.fromisoformat(date[0]).date()
-    dateBefore = datetime.fromisoformat(date[1]).date()
+    dateAfter = datetime.datetime.fromisoformat(date[0])
+    dateBefore = datetime.datetime.fromisoformat(date[1])
     #print type of date:
     print(type(date))
     print("User date: "+str(date))
-    dict_parameters['dateAfter'] = dateAfter
-    dict_parameters['dateBefore'] = dateBefore
+
+    user_session = UserSession.objects.get(session_id=session_id)
+    user_session.date_before = dateBefore
+    user_session.date_after = dateAfter
+    user_session.save()
     response = {
-        'session': user_session.session_id
+        'session': session_id
     }
     return response
 
 def userProvidesDateRelevance(parameters, user_session):
+    session_id = user_session.session_id
     relevance = parameters['number-integer']
-    dict_parameters['dateRelevance'] = int(relevance)
-    print("User date relevance: "+str(relevance))
-    add_date_score(dict_parameters['dateAfter'], dict_parameters['dateBefore'], dict_parameters['dateRelevance'])
-    dict_ordered = dict(list(sorted(dictScores.items(), key=lambda item: (-item[1], -item[0].average_rating, item[0].num_ratings)))[:20])
+    isRelValid, response = isRelevanceValid(relevance, user_session)
+    if not isRelValid:
+        return response
+    waiting = user_session.is_waiting
+    while(waiting):
+        time.sleep(3)
+        user_session = UserSession.objects.get(session_id=session_id)
+        waiting = user_session.is_waiting
+    user_session.is_waiting = True
+    user_session.date_relevance = int(relevance)
+    user_session.save()
+    add_date_score(user_session)
+    dict_ordered = dict(list(sorted(dictScores[user_session].items(), key=lambda item: (-item[1], -item[0].average_rating, item[0].num_ratings)))[:20])
     print(str(dict_ordered))
     response = {
+        'fulfillmentText': 'localhost:8000/results/?session='+str(user_session.session_id),
         'session': user_session.session_id
     }
     return response
