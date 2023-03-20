@@ -1,5 +1,5 @@
-{
-    // Use IntelliSense to learn about possible attributes.
+& 'C:\Program Files\Python38\python.exe' 'c:\Users\Usuario\.vscode\extensions\ms-python.python-2023.4.1\pythonFiles\lib\python\debugpy\adapter/../..\debugpy\launcher' '59874' '--' 'C:\AII\AIIBookRecommender\BookRecommender\manage.py' 'runserver{
+{    // Use IntelliSense to learn about possible attributes.
     // Hover to view descriptions of existing attributes.
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",

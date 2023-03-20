@@ -4,7 +4,7 @@ from django.shortcuts import render
 from main.RS import *
 from main.fulfillments import *
 from main.models import Author, Setting, UserSession
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.contrib.sessions.backends.db import SessionStore
 
 import json
@@ -19,9 +19,18 @@ from django.template.defaulttags import register
 from django.views.decorators.csrf import csrf_exempt
 
 
-
+def deleteOldUserSessions():
+    OldUserSessions= UserSession.objects.filter(date_last_used__lt=datetime.now()-timedelta(days=1))
+    for oldusersession in OldUserSessions:
+        if oldusersession in dictScores:
+            del dictScores[oldusersession]
+        if oldusersession.session_id in dictMatching:
+            del dictMatching[oldusersession]
+    OldUserSessions.delete()
 
 def index(request):
+    #DELETE ALL UserSession with more than 24 hours since their date_created:
+    deleteOldUserSessions()
     return render(request, 'base_INDEX.html')
 
 def populateDatabase(request):
@@ -132,6 +141,8 @@ def webhook(request):
         response = userProvidesDate(parameters, user_session)
     if intent == 'UserProvidesDateRelevance':
         response = userProvidesDateRelevance(parameters, user_session)
+    if intent == 'UserProvidesDateEmpty':
+        response = userProvidesDateEmpty(user_session)
 
 
     
@@ -140,13 +151,11 @@ def webhook(request):
 
 
 #TODO:
-#limitar relevancias entre 1 y 10
-#rating que no se salga de 1 y 5
-#que london no sea una persona xd (o que no llegue el context de autor aquí)
 #Refactorizar
 #unificar atributos: rate, rating y demas
-#checkear q funciona bien el entrenamiento de userprovidesuseragerelevance
-#Controlar el borrado de los dicts y de las entidades al pasar cierto tiempo (24 horas o limitarlo a numero de instancias)
+#Que en el mensaje de similar author ponga también el autor al que es similar.
 
+#No se puede controlar que el rating no salga de 1 a 5, y el pages relevance, porque entra en los otros contextos.HAy que sacar
+#la forma de hacer set del contexto con fulfillment y que SOLO tenga ese contexto.
 
 

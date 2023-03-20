@@ -1,5 +1,4 @@
 from django.test import TestCase
-
 from main.models import *
 from main.RS import *
 # Create your tests here.
@@ -52,88 +51,130 @@ class RecommendationSystemTestCase(TestCase):
             publish_date="1977-01-28",
         )
 
+        UserSession.objects.create(
+            session_id="1",
+            name="Jon",
+            age=20,
+            age_relevance=4,
+            genres_relevance=10,
+            author_name = "Jon Denbrough",
+            author_relevance = 2,
+            similar_authors_relevance = 2,
+            settings_relevance = 2,
+            pages_number = 500,
+            pages_number_relevance = 2,
+            rating = 4,
+            rating_relevance = 3,
+            date_after = datetime.date(2010, 4, 7),
+            date_before = datetime.date(2015, 4, 7),
+            date_relevance = 2
+        )
         Book.objects.get(book_id=1).authors.add(Author.objects.get(author_id=1))
         Book.objects.get(book_id=2).authors.add(Author.objects.get(author_id=2))
         Book.objects.get(book_id=1).setting.add(Setting.objects.get(setting_id=1))
         Book.objects.get(book_id=2).setting.add(Setting.objects.get(setting_id=2))
         Book.objects.get(book_id=1).genres.add(Genre.objects.get(genre_id=1))
         Book.objects.get(book_id=2).genres.add(Genre.objects.get(genre_id=2))
-
-    book_1 = Book.objects.get(book_id=1)
-    book_2 = Book.objects.get(book_id=2)
-    list_of_books = [book_1, book_2]
+        UserSession.objects.get(session_id="1").genres.add(Genre.objects.get(genre_id=1))
+        UserSession.objects.get(session_id="1").similar_authors.add(Author.objects.get(author_id=3))
+        UserSession.objects.get(session_id="1").settings.add(Setting.objects.get(setting_id=1))
 
     def test_age(self):
-        reset_scores()
-        add_age_score(20, 4)
-        for book in self.list_of_books:
-            if book not in dictScores:
-                dictScores[book] = 0
-        self.assertTrue(dictScores[self.book_1]>dictScores[self.book_2])
+        book_1 = Book.objects.get(book_id=1)
+        book_2 = Book.objects.get(book_id=2)
+        user_session = UserSession.objects.get(session_id="1")
+        
+        list_of_books = [book_1, book_2]
+        reset_scores(user_session)
+        add_age_score(user_session)
+        for book in list_of_books:
+            if book not in dictScores[user_session]:
+                dictScores[user_session][book] = 0
+        self.assertTrue(dictScores[user_session][book_1]>dictScores[user_session][book_2])
 
     def test_genres(self):
-        reset_scores()
-        genres = Genre.objects.filter(Q(name='Mystery'))
-        add_genres_score(genres, 10)
-        for book in self.list_of_books:
-            if book not in dictScores:
-                dictScores[book] = 0
-        self.assertTrue(dictScores[self.book_1]>dictScores[self.book_2])
+        book_1 = Book.objects.get(book_id=1)
+        book_2 = Book.objects.get(book_id=2)
+        user_session = UserSession.objects.get(session_id="1")
+        list_of_books = [book_1, book_2]
+        reset_scores(user_session)
+        add_genres_score(user_session)
+        for book in list_of_books:
+            if book not in dictScores[user_session]:
+                dictScores[user_session][book] = 0
+        self.assertTrue(dictScores[user_session][book_1]>dictScores[user_session][book_2])
     
     def test_author(self):
-        reset_scores()
-        author = Author.objects.get(name='Jon Denbrough')
-        add_author_score(author, 2)
-        for book in self.list_of_books:
-            if book not in dictScores:
-                dictScores[book] = 0
-        self.assertTrue(dictScores[self.book_1]>dictScores[self.book_2])
+        book_1 = Book.objects.get(book_id=1)
+        book_2 = Book.objects.get(book_id=2)
+        user_session = UserSession.objects.get(session_id="1")
+        list_of_books = [book_1, book_2]
+        reset_scores(user_session)
+        add_author_score(user_session)
+        for book in list_of_books:
+            if book not in dictScores[user_session]:
+                dictScores[user_session][book] = 0
+        self.assertTrue(dictScores[user_session][book_1]>dictScores[user_session][book_2])
     
     def test_similar_author(self):
-        reset_scores()
-        author = Author.objects.get(name='Pierce Brown')
-        authors = [author]
-        add_similar_authors_score(authors, 2)
-        for book in self.list_of_books:
-            if book not in dictScores:
-                dictScores[book] = 0
-        self.assertTrue(dictScores[self.book_1]<dictScores[self.book_2])
+        book_1 = Book.objects.get(book_id=1)
+        book_2 = Book.objects.get(book_id=2)
+        user_session = UserSession.objects.get(session_id="1")
+        list_of_books = [book_1, book_2]
+        reset_scores(user_session)
+        add_similar_authors_score(user_session)
+        for book in list_of_books:
+            if book not in dictScores[user_session]:
+                dictScores[user_session][book] = 0
+        self.assertTrue(dictScores[user_session][book_1]<dictScores[user_session][book_2])
 
 
     def test_setting(self):
-        reset_scores()
-        setting = Setting.objects.filter(Q(name__icontains='Maastricht'))
-        add_setting_score(setting, 2)
-        for book in self.list_of_books:
-            if book not in dictScores:
-                dictScores[book] = 0
-        self.assertTrue(dictScores[self.book_1]>dictScores[self.book_2])
+        book_1 = Book.objects.get(book_id=1)
+        book_2 = Book.objects.get(book_id=2)
+        user_session = UserSession.objects.get(session_id="1")
+        list_of_books = [book_1, book_2]
+        reset_scores(user_session)
+        add_settings_score(user_session)
+        for book in list_of_books:
+            if book not in dictScores[user_session]:
+                dictScores[user_session][book] = 0
+        self.assertTrue(dictScores[user_session][book_1]>dictScores[user_session][book_2])
     
     def test_pages_number(self):
-        reset_scores()
-        add_pages_number_score(500, 2)
-        for book in self.list_of_books:
-            if book not in dictScores:
-                dictScores[book] = 0
-        self.assertTrue(dictScores[self.book_1]>dictScores[self.book_2])
+        book_1 = Book.objects.get(book_id=1)
+        book_2 = Book.objects.get(book_id=2)
+        user_session = UserSession.objects.get(session_id="1")
+        list_of_books = [book_1, book_2]
+        reset_scores(user_session)
+        add_pages_number_score(user_session)
+        for book in list_of_books:
+            if book not in dictScores[user_session]:
+                dictScores[user_session][book] = 0
+        self.assertTrue(dictScores[user_session][book_1]>dictScores[user_session][book_2])
     
     def test_publish_date(self):
-        reset_scores()
-        date_after = datetime.date(2010, 4, 7)
-        date_before = datetime.date(2015, 4, 7)
-        add_date_score(date_after, date_before, 2)
-        for book in self.list_of_books:
-            if book not in dictScores:
-                dictScores[book] = 0
-        self.assertTrue(dictScores[self.book_1]>dictScores[self.book_2])
+        book_1 = Book.objects.get(book_id=1)
+        book_2 = Book.objects.get(book_id=2)
+        user_session = UserSession.objects.get(session_id="1")
+        list_of_books = [book_1, book_2]
+        reset_scores(user_session)
+        add_date_score(user_session)
+        for book in list_of_books:
+            if book not in dictScores[user_session]:
+                dictScores[user_session][book] = 0
+        self.assertTrue(dictScores[user_session][book_1]>dictScores[user_session][book_2])
 
     def test_rating(self):
-        reset_scores()
-        add_rating_score(4, 3)
-        for book in self.list_of_books:
-            if book not in dictScores:
-                dictScores[book] = 0
-        self.assertTrue(dictScores[self.book_1]>dictScores[self.book_2])
-
+        book_1 = Book.objects.get(book_id=1)
+        book_2 = Book.objects.get(book_id=2)
+        user_session = UserSession.objects.get(session_id="1")
+        list_of_books = [book_1, book_2]
+        reset_scores(user_session)
+        add_rating_score(user_session)
+        for book in list_of_books:
+            if book not in dictScores[user_session]:
+                dictScores[user_session][book] = 0
+        self.assertTrue(dictScores[user_session][book_1]>dictScores[user_session][book_2])
 
 

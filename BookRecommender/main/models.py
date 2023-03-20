@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 # Create your models here.
 class Author(models.Model):
@@ -59,6 +60,7 @@ class UserSession(models.Model):
     date_after = models.DateField(verbose_name="Fecha posterior",null=True)
     date_relevance = models.IntegerField(verbose_name='Relevancia de la fecha', null=True)
     is_waiting = models.BooleanField(default=False)
+    date_last_used = models.DateTimeField(default=timezone.now)
 
 
 

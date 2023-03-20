@@ -83,6 +83,7 @@ def add_age_score(user_session):
                         else:
                             dictScores[user_session][book] = age_relevance / len(preferred_genres_by_age['18-35'])
                     else:
+                        print("no entro aquí")
                         dictScores[user_session] = dict()
                         dictScores[user_session][book] = age_relevance / len(preferred_genres_by_age['18-35'])
                     add_matching_text(genre, book, matching_text, user_session)
@@ -101,6 +102,7 @@ def add_age_score(user_session):
     user_session = UserSession.objects.get(session_id=session_id)
     user_session.is_waiting = False
     user_session.save()
+    print(dictScores)
 
 def add_genres_score(user_session):
     session_id = user_session.session_id
@@ -244,6 +246,7 @@ def add_pages_number_score(user_session):
     user_session.save()
 
 def add_rating_score(user_session):
+    session_id = user_session.session_id
     rating = user_session.rating
     rating_relevance = int(user_session.rating_relevance)
     for book in books:
@@ -268,11 +271,13 @@ def add_rating_score(user_session):
                 else:
                     dictScores[user_session] = dict()
                     dictScores[user_session][book] = -(rating - float(book.average_rating)) * rating_relevance
+    user_session = UserSession.objects.get(session_id=session_id)
     user_session.is_waiting = False
     user_session.save()
 
 
 def add_date_score(user_session):
+    session_id = user_session.session_id
     date_after = user_session.date_after
     date_before = user_session.date_before
     date_relevance = int(user_session.date_relevance)
@@ -308,6 +313,7 @@ def add_date_score(user_session):
                 else:
                     dictScores[user_session] = dict()
                     dictScores[user_session][book] = -(date_after - book.publish_date).days * date_relevance / 365*3
+    user_session = UserSession.objects.get(session_id=session_id)
     user_session.is_waiting = False
     user_session.save()
 

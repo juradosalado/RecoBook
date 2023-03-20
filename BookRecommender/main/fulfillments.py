@@ -2,6 +2,7 @@
 
 from main.RS import *
 import time
+from django.utils import timezone
 
 from main.models import UserSession
 
@@ -21,11 +22,13 @@ def isRelevanceValid(relevance, user_session):
 def userProvidesName(parameters, user_session):
     session_id = user_session.session_id
     reset_scores(user_session)
+    #set user_session date_last_used to right now:
+    user_session.date_last_used = timezone.now()
     name = parameters['person']['name']
     user_session.name = name
     user_session.save()
     #dict_parameters['userName'] = name
-    text = "Nice to meet you, " +name+"! Let's start with the questions that will help me find you a new book to read. How old are you? It is important for you to know that, for every question I ask you, you do not have to answer me if you don't want to, or just don't care about it. In that case, just let me know you would rather not to response."
+    text = "Nice to meet you, " +name+"! Let's start with the questions that will help me find you a new book to read. How old are you? It is important for you to know that, for every question I ask you, you do not have to answer me if you don't want to, or just don't care about it. In that case, just let me know by saying: 'I don't care about my age'."
     #print(text)
     response = {
             'fulfillmentText': text,
@@ -346,7 +349,14 @@ def userProvidesDateRelevance(parameters, user_session):
     dict_ordered = dict(list(sorted(dictScores[user_session].items(), key=lambda item: (-item[1], -item[0].average_rating, item[0].num_ratings)))[:20])
     print(str(dict_ordered))
     response = {
-        'fulfillmentText': 'localhost:8000/results/?session='+str(user_session.session_id),
+        'fulfillmentText': "Great! That's everything I need. I just travelled through Narnia, the Seven Kingdoms and even the whole Cosmere looking for the perfect books for you... This is what i found! localhost:8000/results/?session="+str(user_session.session_id),
+        'session': user_session.session_id
+    }
+    return response
+
+def userProvidesDateEmpty(user_session):
+    response = {
+        'fulfillmentText': "Great! That's everything I need. I just travelled through Narnia, the Seven Kingdoms and even the whole Cosmere looking for the perfect books for you... This is what i found! localhost:8000/results/?session="+str(user_session.session_id),
         'session': user_session.session_id
     }
     return response
