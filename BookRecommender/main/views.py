@@ -80,7 +80,6 @@ def details(request,id):
 def webhook(request):
     print("Empeizan prints")
     print(request.session)
-    # Get the session ID from the request
     req = json.loads(request.body)
     if 'session' in req:
         session_id = req['session']
@@ -88,8 +87,6 @@ def webhook(request):
     else:
         session_id = str(uuid.uuid4())
         print("Esta es la nueva id:"+ session_id)
-    
-    #Get User_Session by session_id and create one if it doesnt exist:
     user_session = UserSession.objects.filter(session_id=session_id)
     if not user_session:
         user_session = UserSession.objects.create(session_id=session_id)

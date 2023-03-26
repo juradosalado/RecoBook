@@ -1,0 +1,45 @@
+.title-row{
+    margin-top: 2rem;
+}
+
+.title-row h2{
+    font-size: 2.75rem;
+    font-weight: 700;
+}
+
+.title-col p{
+    margin-top: 2rem;
+    margin-left: 20rem;
+    font-size: 1.5rem;
+}
+
+.try-btn{
+    margin-top: 2rem;
+    margin-left: 20rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    border-radius: 1px;
+    padding: 0.5rem 1rem;
+}
+
+@media (max-width: 767px) {
+    .img-col {
+      display: none;
+    }
+
+    .icon-img{
+        width: 100%;
+    }
+
+    .title-col p{
+        margin-top: 2rem;
+        margin-left: auto;
+        font-size: 1.5rem;
+    }
+    
+    .icon-img{
+        display: none;
+    }
+
+    
+  }

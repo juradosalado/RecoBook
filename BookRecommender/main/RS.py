@@ -14,6 +14,7 @@ preferred_genres_by_age=dict()
 preferred_genres_by_age['0-18']= Genre.objects.filter(Q(name__icontains='Graphic') |Q(name__icontains='Comic') | Q(name__icontains='Comedy') | Q(name__icontains='Humor') | Q(name__icontains="Fantasy") | Q(name__icontains='Science Fiction')| Q(name__icontains='Young Adult'))
 preferred_genres_by_age['18-35']= Genre.objects.filter(Q(name__icontains='Mystery') | Q(name__icontains='Thriller') | Q(name__icontains='Crime') | Q(name__icontains='Romance') | Q(name__icontains="Fantasy") | Q(name__icontains='Science Fiction'))
 preferred_genres_by_age['36-70+']= Genre.objects.filter(Q(name__icontains='Mystery') | Q(name__icontains='Thriller') | Q(name__icontains='Crime') | Q(name__icontains='Biography') | Q(name__icontains='History') | Q(name__icontains='Historical'))
+
 def reset_scores(user_session):
     if user_session in dictScores:
         dictScores[user_session].clear()
@@ -49,7 +50,18 @@ def add_matching_text(element, book, matching_text, user_session):
 
 
 
-
+def aux_add_age_score(user_session, book, age_relevance, matching_text, age_range):
+    for genre in preferred_genres_by_age[age_range]:
+                if genre in book.genres.all():
+                    if user_session in dictScores:
+                        if book in dictScores[user_session]:
+                            dictScores[user_session][book] += age_relevance / len(preferred_genres_by_age[age_range])
+                        else:
+                            dictScores[user_session][book] = age_relevance / len(preferred_genres_by_age[age_range])
+                    else:
+                        dictScores[user_session] = dict()
+                        dictScores[user_session][book] = age_relevance / len(preferred_genres_by_age[age_range])
+                    add_matching_text(genre, book, matching_text, user_session)
 
 
 def add_age_score(user_session):
@@ -59,50 +71,18 @@ def add_age_score(user_session):
     matching_text = "Most popular genres by readers of your age: "
     for book in books:
         if age <= 18:
-            for genre in preferred_genres_by_age['0-18']:
-                if genre in book.genres.all():
-                    if user_session in dictScores:
-                        if book in dictScores[user_session]:
-                            dictScores[user_session][book] += age_relevance / len(preferred_genres_by_age['0-18'])
-                        else:
-                            dictScores[user_session][book] = age_relevance / len(preferred_genres_by_age['0-18'])
-                    else:
-                        dictScores[user_session] = dict()
-                        dictScores[user_session][book] = age_relevance / len(preferred_genres_by_age['0-18'])
-                    add_matching_text(genre, book, matching_text, user_session)
+            aux_add_age_score(user_session, book, age_relevance, matching_text, '0-18')
             #It tries not to recommend long books to young kids
             if age<=13 and book.pages_number>300:
                 dictScores[user_session][book] -= age_relevance / 2
 
         elif age <= 35:
-            for genre in preferred_genres_by_age['18-35']:
-                if genre in book.genres.all():
-                    if user_session in dictScores:
-                        if book in dictScores[user_session]:
-                            dictScores[user_session][book] += age_relevance / len(preferred_genres_by_age['18-35'])
-                        else:
-                            dictScores[user_session][book] = age_relevance / len(preferred_genres_by_age['18-35'])
-                    else:
-                        print("no entro aquí")
-                        dictScores[user_session] = dict()
-                        dictScores[user_session][book] = age_relevance / len(preferred_genres_by_age['18-35'])
-                    add_matching_text(genre, book, matching_text, user_session)
+            aux_add_age_score(user_session, book, age_relevance, matching_text, '18-35')
         else:
-            for genre in preferred_genres_by_age['36-70+']:
-                if genre in book.genres.all():
-                    if user_session in dictScores:
-                        if book in dictScores[user_session]:
-                            dictScores[user_session][book] += age_relevance / len(preferred_genres_by_age['36-70+'])
-                        else:
-                            dictScores[user_session][book] = age_relevance / len(preferred_genres_by_age['36-70+'])
-                    else:
-                        dictScores[user_session] = dict()
-                        dictScores[user_session][book] = age_relevance / len(preferred_genres_by_age['36-70+'])
-                    add_matching_text(genre, book, matching_text, user_session)
+            aux_add_age_score(user_session, book, age_relevance, matching_text, '36-70+')
     user_session = UserSession.objects.get(session_id=session_id)
     user_session.is_waiting = False
     user_session.save()
-    print(dictScores)
 
 def add_genres_score(user_session):
     session_id = user_session.session_id
@@ -130,7 +110,6 @@ def add_genres_score(user_session):
 def add_author_score(user_session):
     session_id = user_session.session_id
     author_name = user_session.author_name
-    print(author_name)
     #it will always find an author, because it wouldn't call the function if it doesn't
     author = Author.objects.get(name=author_name)
     author_relevance = int(user_session.author_relevance)
@@ -235,12 +214,13 @@ def add_pages_number_score(user_session):
             else:
                 if user_session in dictScores:
                     if book in dictScores[user_session]:
-                        dictScores[user_session][book] -= (book.pages_number - pages_number) * pages_number_relevance /300
+                        #if relevance is 10 and the books have 100 pages more than user wanted, it will add nothing
+                        dictScores[user_session][book] += pages_number_relevance - (book.pages_number - pages_number) * 0.01*pages_number_relevance
                     else:
-                        dictScores[user_session][book] = -(book.pages_number - pages_number) * pages_number_relevance /300
+                        dictScores[user_session][book] = pages_number_relevance - (book.pages_number - pages_number) * 0.01*pages_number_relevance
                 else:
                     dictScores[user_session] = dict()
-                    dictScores[user_session][book] = -(book.pages_number - pages_number) * pages_number_relevance /300
+                    dictScores[user_session][book] = pages_number_relevance - (book.pages_number - pages_number) * 0.01*pages_number_relevance
     user_session = UserSession.objects.get(session_id=session_id)
     user_session.is_waiting = False
     user_session.save()
@@ -265,12 +245,13 @@ def add_rating_score(user_session):
             else:
                 if user_session in dictScores:
                     if book in dictScores:
-                        dictScores[user_session][book] -= (rating - float(book.average_rating)) * rating_relevance
+                        #if relevance = 10 and the book has 1 point less than user wanted, it will add nothing
+                        dictScores[user_session][book] += rating_relevance - (rating - float(book.average_rating)) *1*rating_relevance
                     else:
-                        dictScores[user_session][book] = -(rating - float(book.average_rating)) * rating_relevance
+                        dictScores[user_session][book] = rating_relevance - (rating - float(book.average_rating)) *1*rating_relevance
                 else:
                     dictScores[user_session] = dict()
-                    dictScores[user_session][book] = -(rating - float(book.average_rating)) * rating_relevance
+                    dictScores[user_session][book] = rating_relevance - (rating - float(book.average_rating)) *1*rating_relevance
     user_session = UserSession.objects.get(session_id=session_id)
     user_session.is_waiting = False
     user_session.save()
@@ -298,54 +279,22 @@ def add_date_score(user_session):
                 else:
                     if user_session in dictScores:
                         if book in dictScores[user_session]:
-                            dictScores[user_session][book] -= (book.publish_date -date_before).days * date_relevance / 365*3
+                            #if relevance is 3 and it was published 3 years later, it will add nothing
+                            dictScores[user_session][book] += date_relevance - ((book.publish_date -date_before).days / 365 *3)* date_relevance
                         else:
-                            dictScores[user_session][book] = -(book.publish_date - date_before).days * date_relevance / 365*3
+                            dictScores[user_session][book] = date_relevance - ((book.publish_date -date_before).days / 365 *3)* date_relevance
                     else:
                         dictScores[user_session] = dict()
-                        dictScores[user_session][book] = -(book.publish_date - date_before).days * date_relevance / 365*3
+                        dictScores[user_session][book] = date_relevance - ((book.publish_date -date_before).days / 365 *3)* date_relevance
             else:
                 if user_session in dictScores:
                     if book in dictScores[user_session]:
-                        dictScores[user_session][book] -= (date_after -book.publish_date).days * date_relevance / 365*3
+                        dictScores[user_session][book] +=  date_relevance - ((date_before-book.publish_date ).days / 365 *3)* date_relevance
                     else:
-                        dictScores[user_session][book] = -(date_after - book.publish_date).days * date_relevance / 365*3
+                        dictScores[user_session][book] = date_relevance - ((date_before-book.publish_date ).days / 365 *3)* date_relevance
                 else:
                     dictScores[user_session] = dict()
-                    dictScores[user_session][book] = -(date_after - book.publish_date).days * date_relevance / 365*3
+                    dictScores[user_session][book] = date_relevance - ((date_before-book.publish_date ).days / 365 *3)* date_relevance
     user_session = UserSession.objects.get(session_id=session_id)
     user_session.is_waiting = False
     user_session.save()
-
-
-
-# def add_date_before_score(date, date_before_relevance):
-#     for book in books:
-#         if book.publish_date is not None:
-#             if book.publish_date <= date:
-#                 if book in dictScores:
-#                     dictScores[book] += date_before_relevance
-#                 else:
-#                     dictScores[book] = date_before_relevance
-#                 add_matching_text(book.publish_date, book, matching_text= "Published after the date you stablished: ")
-#             else:
-#                 if book in dictScores:
-#                     dictScores[book] -= (book.publish_date - date).days * date_before_relevance / 365*3
-#                 else:
-#                     dictScores[book] = -(book.publish_date - date).days * date_before_relevance / 365*3
-
-# def add_date_after_score(date, date_after_relevance):
-#     for book in books:
-#         if book.publish_date is not None:
-#             if book.publish_date >= date:
-#                 if book in dictScores:
-#                     dictScores[book] += date_after_relevance
-#                 else:
-#                     dictScores[book] = date_after_relevance
-#                 add_matching_text(book.publish_date, book, matching_text= "Published after the date you stablished: ")
-#             else:
-#                 if book in dictScores:
-#                     dictScores[book] -= (date - book.publish_date).days * date_after_relevance / 365*3
-#                 else:
-#                     dictScores[book] = -(date - book.publish_date).days * date_after_relevance / 365*3
-
