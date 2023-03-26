@@ -20,6 +20,7 @@ from main import views
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('',views.index),
+    path('chatbot/', views.chatbot),
     path("populate/", views.populateDatabase),
     path("recommend/", views.recommend),
     path('webhook/', views.webhook, name='webhook'),

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Principal Page RecoBook{% endblock %}
+
+{% block head %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/chatbot.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-5 img-col">
+        <img src="{% static 'images/libreria.jpg' %}" alt="A library picture" class="index-img">
+      </div>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
+<df-messenger
+  intent="WELCOME"
+  chat-title="RecoBook"
+  chat-icon="{% static 'images/recoIcon.png' %}"
+  agent-id="d12d3827-66b1-4858-a83c-2228f6ee8287"
+  language-code="en"
+  expand="True"
+></df-messenger>
+
+
+{% endblock %}

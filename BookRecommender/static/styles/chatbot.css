@@ -1,0 +1,12 @@
+body{
+    background-color: #f9fbee;
+
+}
+
+.img-col{
+    padding-left: 0%;
+}
+
+df-messenger{
+    --df-messenger-button-titlebar-color: var(--main-color);
+}

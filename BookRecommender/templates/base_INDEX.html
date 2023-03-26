@@ -5,6 +5,11 @@
 {% block head %}
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'styles/index.css' %}">
+    <script>
+        function chatbot() {
+            window.location.href = "/chatbot";
+        }
+    </script>
 {% endblock %}
 
 {% block content %}
@@ -27,42 +32,11 @@
           only having a conversation with you. Meet our chatbot now and start looking for your next reading!
         </p>
       </div>
-      <button class="btn btn-outline-secondary text-gray-500 try-btn" style="background-color: white;">TRY NOW</button>
+      <button class="btn btn-outline-secondary text-gray-500 try-btn" onclick="chatbot()" style="background-color: white;">TRY NOW</button>
 
 
       
     </div>
   </div>
 </div>
-
-<div class="container-fluid">
-
-  <!-- First Row -->
-  <div class="row">
-    <div class="col-sm-4 bg-primary text-white">Column 1</div>
-    <div class="col-sm-4 bg-secondary text-white">Column 2</div>
-    <div class="col-sm-4 bg-success text-white">Column 3</div>
-  </div>
-
-  <!-- Second Row -->
-  <div class="row">
-    <div class="col-md-6 bg-danger text-white">Column 1</div>
-    <div class="col-md-6 bg-warning text-white">Column 2</div>
-  </div>
-
-  <!-- Third Row -->
-  <div class="row">
-    <div class="col-lg-12 bg-info text-white">Column 1</div>
-  </div>
-
-</div>
-<script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
-<df-messenger
-  intent="WELCOME"
-  chat-title="RecoBook"
-  agent-id="d12d3827-66b1-4858-a83c-2228f6ee8287"
-  language-code="en"
-></df-messenger>
-
-
 {% endblock %}

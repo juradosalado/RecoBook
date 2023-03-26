@@ -1,7 +1,15 @@
 /*Navbar CSS*/
 
+.navbar{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+
+
+}
 .bg-navbar {
-    background-color:#488d7d;
+    background-color:var(--main-color)
 }
 
 .flex-search {
@@ -27,5 +35,14 @@
         justify-content: center;
         align-items: center;
         width: 100%;
+    }
+
+    .navbar{
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+    
+    
     }
 }

@@ -4,41 +4,57 @@
 
 {% block head %}
     {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/details.css' %}">
+    <script src="{% static 'js/readMore.js' %}"></script>
 {% endblock %}
 
 {% block content %}
-<h2>{{ book.title }}</h2>
-<img src={{ book.cover }}>
-<p>Author: 
-    {% if book.authors.all %}
-        {% for author in book.authors.all %}
-            {{ author.name }},
-        {% endfor %}
-    {% else %}
-        Unkown author.
-    {% endif %}
-</p>
-<p>Description: {{book.description}}</p>
-
-<p>Genres:
-    {% if book.genres.all %}
-        {% for genre in book.genres.all %}
-            {{ genre.name }}; 
-        {% endfor %}
-    {% else %}
-        Unkown genres.
-    {% endif %}
-</p>
-<p>Number of pages: {{book.pages_number}}</p>
-<p>Setting:
-    {% if book.setting.all %}
-    {% for setting in book.setting.all %}
-        {{ setting.name }}; 
-    {% endfor %}
-    {% else %}
-        Unkown settings.
-    {% endif %}
-</p>
-<p>Publish date: {{book.publish_date}}</p>
-<p>Average Goodreads Rating Score: {{book.average_rating}}</p>
+<div class="container-fluid">
+    <div class="row title-row">
+      <div class="col-sm-12 title-col">
+        <h2>{{ book.title }}</h2>
+      </div>
+    </div>
+    <div class="row content-row">
+        <div class="col-sm-3 img-col">
+            <img src={{ book.cover }}>
+        </div>
+        <div class="col-sm-9 content-col">
+            <p>Author: 
+                {% if book.authors.all %}
+                    {% for author in book.authors.all %}
+                        {{ author.name }},
+                    {% endfor %}
+                {% else %}
+                    Unkown author.
+                {% endif %}
+            </p>
+            <div class="description-div">
+                <p>Description: {{book.description}}</p>
+            </div>
+            <button class="read-more">Read More</button>
+            <p>Genres:
+                {% if book.genres.all %}
+                    {% for genre in book.genres.all %}
+                        {{ genre.name }}; 
+                    {% endfor %}
+                {% else %}
+                    Unkown genres.
+                {% endif %}
+            </p>
+            <p>Number of pages: {{book.pages_number}}</p>
+            <p>Setting:
+                {% if book.setting.all %}
+                {% for setting in book.setting.all %}
+                    {{ setting.name }}; 
+                {% endfor %}
+                {% else %}
+                    Unkown settings.
+                {% endif %}
+            </p>
+            <p>Publish date: {{book.publish_date}}</p>
+            <p>Average Goodreads Rating Score: {{book.average_rating}}</p>
+        </div>
+    </div>
+</div>
 {% endblock %}

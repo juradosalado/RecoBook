@@ -33,6 +33,9 @@ def index(request):
     deleteOldUserSessions()
     return render(request, 'base_INDEX.html')
 
+def chatbot(request):
+    return render(request, 'base_CHATBOT.html')
+
 def populateDatabase(request):
     (b, g, s, a)=populate()
 

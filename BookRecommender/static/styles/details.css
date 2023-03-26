@@ -1,0 +1,26 @@
+.title-row{
+    margin-top: 5rem;
+    margin-bottom: 2rem;
+    margin-left: 2rem;
+}
+
+.title-row h2{
+    font-size: 3.75rem;
+    font-weight: 700;
+}
+
+.content-row{
+    margin-left: 2rem;
+    margin-right: 2rem;
+}
+
+.content-row p{
+    font-size: 1.5rem;
+    font-weight: 400;
+}
+
+.description-div{
+    font-size: 1.5rem;
+    font-weight: 400;
+}
+
