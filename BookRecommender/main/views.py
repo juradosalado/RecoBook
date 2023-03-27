@@ -73,7 +73,7 @@ def showResults(request, session_id):
     user_session = UserSession.objects.get(session_id=session_id)
     dict_ordered = dict(list(sorted(dictScores[user_session].items(), key=lambda item: (-item[1], -item[0].average_rating, item[0].num_ratings)))[:20])
     print(dict_ordered)
-    return render(request, 'base_RECOMMEND_FORM.html', {'dict': dict_ordered, 'dict_matching': dictMatching[user_session]})
+    return render(request, 'base_RESULTS.html', {'dict': dict_ordered, 'dict_matching': dictMatching[user_session]})
 
 def details(request,id):
     book = Book.objects.get(book_id=id)

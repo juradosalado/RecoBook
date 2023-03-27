@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Principal Page RecoBook{% endblock %}
+
+{% block head %}
+    {% load static %}
+    {% load custom_filters %}
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/results.css' %}">
+    <script>
+        function details(book_id) {
+            window.location.href = "/details/"+book_id;
+        }
+    </script>
+{% endblock %}
+
+{% block content %}
+<h1 class="title">This is what I found for you!</h1>
+<div class="container-fluid">
+    {% for k, v in dict.items %}
+        <div class="row title-row">
+            <div class="col-sm-12 title-col">
+                <h2>#{{ forloop.counter }}: {{ k.title }}</h2>
+            </div>
+        </div>
+        <div class="row content-row">
+            <div class="col-sm-3 img-col">
+                <img src={{ k.cover }} class="cover-img">
+            </div>
+            <div class="col-sm-9 content-col">
+                {% for x, y in dict_matching.items %}
+                    {% if k == x %}
+                        <p>Matchings:</p>
+                        <ul>
+                        {% for match in y %}
+                        <li><strong>{{ match|split_first:":"}}</strong>: {{ match|split_last:":"}}.</li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endfor %}
+                <button class="btn btn-outline-secondary details-btn" onclick="details('{{k.book_id}}')">More Details</button>
+                
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+
+
+
+
+{% endblock %}

@@ -27,6 +27,12 @@ body{
     font-weight: 400;
 }
 
+.img-col img{
+    max-height: 30rem;
+    width: auto;
+    min-height: 30rem;
+}
+
 
 
 .read-more-btn{

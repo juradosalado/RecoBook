@@ -136,7 +136,9 @@ def add_similar_authors_score(user_session):
     similar_authors_relevance = int(user_session.similar_authors_relevance)
     base_url = "https://www.literature-map.com/"
     all_similar_authors = []
+    authors_list = [author for author in authors]
     for author in authors:
+        print(author)
         url = base_url+author.name.replace(' ','+')
         f = urlopen(url)
         s=BeautifulSoup(f, "html.parser")
@@ -148,9 +150,12 @@ def add_similar_authors_score(user_session):
             similar_authors_names.append(similar_author)
             i+=1
         similar_authors = Author.objects.filter(name__in=similar_authors_names)
+        print(similar_authors)
         all_similar_authors.append(similar_authors)
     for book in books:
+        i=0
         for similar_authors in all_similar_authors:
+            already_added_to_matching_text = False
             for author in similar_authors:
                 if author in book.authors.all():
                     if user_session in dictScores:
@@ -161,8 +166,11 @@ def add_similar_authors_score(user_session):
                     else:
                         dictScores[user_session] = dict()
                         dictScores[user_session][book] = similar_authors_relevance / len(authors)
-                    matching_text= "Similar authors to the ones you were looking for: "
-                    add_matching_text(author, book, matching_text, user_session)
+                    if not already_added_to_matching_text:
+                        matching_text= "Author similar to: "
+                        add_matching_text(authors_list[i], book, matching_text, user_session)
+                        already_added_to_matching_text = True
+            i+=1
     user_session = UserSession.objects.get(session_id=session_id)
     user_session.is_waiting = False
     user_session.save()
