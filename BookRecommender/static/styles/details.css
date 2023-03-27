@@ -1,3 +1,6 @@
+body{
+    background-color: #f9fbee;
+}
 .title-row{
     margin-top: 5rem;
     margin-bottom: 2rem;
@@ -22,5 +25,13 @@
 .description-div{
     font-size: 1.5rem;
     font-weight: 400;
+}
+
+
+
+.read-more-btn{
+    color: white;
+    background-color: var(--main-color);
+
 }
 
