@@ -1,0 +1,11 @@
+
+{% block titulo %} 
+	You must been registered to load database
+{% endblock %}   
+
+{% block contenido %} 
+    	<form id="form" method="post" action=''>{% csrf_token %}
+    		<table>{{form}}</table>
+    		<p><input type='submit' value='Poblar BD'></p>	
+    	</form>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Recobook - About Me{% endblock %}
+
+{% block head %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/aboutMe.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <ul class="questions-list">
+        <li>
+            <h2 class="question">What is Recobook?</h2>
+            <p>Recobook is an undergraduate thesis project for University Of Seville developed by Juan Salado Jurado and tutored by Ana Belén Sánchez Jerez.
+                You can find more information about Recobook's developer in the following links:
+            </p>
+            <div class="row developer-row">
+                <a class="developer-link" href="https://github.com/juradosalado">
+                    <i class="fa fa-github" style="font-size:36px"></i>
+                </a>
+                <a class="developer-link" href="https://www.linkedin.com/in/juan-salado-jurado-65aa63231/">
+                    <i class="fa fa-linkedin" style="font-size:36px"></i>
+                </a>
+                <a class="developer-link" href=mailto:"juansaladous@gmail.com">
+                    <i class="fa fa-google" style="font-size:36px"></i>
+                </a>
+                <a class="developer-link" href="https://juradosalado.github.io/portfolio/">
+                    <i class="fa fa-file" style="font-size:36px"></i>
+                </a>
+            </div>
+        </li>
+        <li>
+            <h2 class="question">How does Recobook work?</h2>
+            <p>Recobook is a Dialogflow agent that use Natural Language Processing to understand what user says and process it to data.
+                 Recobook catch your reading preferences and throw that information to a Recommendation System with
+                  constraint-based recommendation, which calculates a score for every single book in Data Base based in your preferences.</p>
+        </li>
+        <li>
+            <h2 class="question">How can I use Recobook?</h2>
+            <p>To use Recobook, you just have you respond our chatbot questions as he suggest you to do. For every parameter that
+                Recobook can scrore for you, it will first ask you for a particular value for that parameter. For example, for genres it
+                will ask you what genres would you want your next read to have. In this type of questions, you can always say you don't 
+                mind about this parameter in your book recommendation. However, be sure of always specify what parameter you are not interested
+                in. For example, for genres you could answer "I'm not interested in <strong>genres</strong>". The, if you are actually
+                interested in that parameter, the chatbot will ask you a relevance number, which must be an integer from 1 to 10. that
+                relevance will be important to add more or less scrore to book that accomplish your parameter preference.
+                At the end of the conversation, Recobook will provide you a link with your recommendation results. I hope you enjoy it!
+            </p>
+        </li>
+        <li>
+            <h2 class="question">What books can Recobook recommend me?</h2>
+            <p>Recobook load books in database from GoodRead's Best Book Ever bookshelf. Books are loaded by a DataSet
+                 from Lorena Casanova Lozano and Sergio Costa Planells that can be found in next link:</p>
+            <a href="https://zenodo.org/record/4265096#.ZCL4tfZBxPZ">GoodRead's Best Books Ever Dataset</a>
+    </ul>
+    
+    <div class="row">
+        
+
+
+        
+        
+    </div>
+</div>
+{% endblock %}

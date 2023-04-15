@@ -1,0 +1,53 @@
+
+body{
+    background-color: #f9fbee;
+}
+
+.questions-list{
+    margin-top:7rem;
+}
+
+.questions-list li{
+    margin-bottom: 3rem;
+}
+
+.questions-list li h2{
+    font-size: 2.1rem;
+    font-weight: 600;
+}
+
+.questions-list li p{
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin-right: 20rem;
+}
+
+.developer-row{
+    display: ruby;
+    margin-bottom: 3rem;
+}
+
+.developer-link {
+    color: #000;
+    text-decoration: none;
+}
+
+.developer-link:hover{
+    color: rgb(81, 81, 81);
+}
+
+
+
+.developer-link i{
+    font-size: 0.5rem;
+    font-weight: 700;
+    margin-right: 0.5rem;
+}
+
+@media (max-width: 767px) {
+    .questions-list li p{
+        margin-right: 2rem;
+    }
+
+    
+  }

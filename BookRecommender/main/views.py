@@ -1,14 +1,18 @@
 import datetime
 import uuid
 from django.shortcuts import render
+from BookRecommender import settings
 from main.RS import *
 from main.fulfillments import *
 from main.models import Author, Setting, UserSession
 from datetime import datetime, timedelta
 from django.contrib.sessions.backends.db import SessionStore
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import login, authenticate, logout
 
 import json
-from django.http import JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 
 from main.populateDB import populate
 
@@ -37,6 +41,28 @@ def index(request):
 def chatbot(request):
     return render(request, 'base_CHATBOT.html')
 
+def aboutMe(request):
+    return render(request, 'base_ABOUTME.html')
+
+def login_for_populate(request):
+    form = AuthenticationForm()
+    if request.method=='POST':
+        form = AuthenticationForm(request.POST)
+        user=request.POST['username']
+        password=request.POST['password']
+        access=authenticate(username=user,password=password)
+        if access is not None:
+            if access.is_active:
+                login(request, access)
+                return (HttpResponseRedirect('/populate'))
+            else:
+                return render(request, 'mensaje_error.html',{'error':"USUARIO NO ACTIVO",'STATIC_URL':settings.STATIC_URL})
+        else:
+            return render(request, 'mensaje_error.html',{'error':"USUARIO O CONTRASEÑA INCORRECTOS",'STATIC_URL':settings.STATIC_URL})
+                     
+    return render(request, 'ingresar.html', {'form':form, 'STATIC_URL':settings.STATIC_URL})
+
+@login_required(login_url='/login')
 def populateDatabase(request):
     (b, g, s, a)=populate()
 

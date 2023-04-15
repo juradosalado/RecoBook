@@ -5,9 +5,11 @@
     <div class="container-fluid">
       
       <div class="d-flex justify-content-center">
-        <img class="icon-web bg-light rounded-2" src="../../static/images/icon.png" alt="E-commerce icon">
         <a class="navbar-brand fw-bold fst-italic text-light text-start" href="/">
-          RecoBook
+          <div class="row navbar-row">
+            <img class="icon-web rounded-1" src="{% static 'images/icon.png' %}" alt="Books icon">
+            RecoBook
+          </div>
         </a>
       </div>
 
@@ -18,15 +20,14 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto collapse-menu">
 
-          
           <li class="nav-item">
-            <a class="nav-link" href="/populate">
-              Populate DB
+            <a class="nav-link" href="/aboutMe">
+              About Me
             </a>
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="/recommend">
+            <a class="nav-link" href="/chatbot">
               Recommend me a book
             </a>
           </li>

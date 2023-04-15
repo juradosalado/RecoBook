@@ -29,6 +29,15 @@
     color: white;
 }
 
+.navbar-row{
+    display: ruby;
+}
+
+.icon-web{
+    max-width: 4rem;
+    height: auto;
+}
+
 @media (max-width: 991px) {
     .collapse-menu{
         display: flex;
