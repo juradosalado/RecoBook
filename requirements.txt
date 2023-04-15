@@ -1,2 +1,12 @@
+asgiref==3.6.0
+beautifulsoup4==4.12.2
+bootstrap4==0.1.0
+bs4==0.0.1
+crispy-bootstrap5==0.7
 Django==4.1.2
-crispy-bootstrap5
+django-crispy-forms==2.0
+mysqlclient==2.1.1
+PyMySQL==1.0.3
+soupsieve==2.4
+sqlparse==0.4.3
+tzdata==2023.3
