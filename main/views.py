@@ -64,7 +64,7 @@ def login_for_populate(request):
 
 @login_required(login_url='/login')
 def populateDatabase(request):
-    (b, g, s, a)=populate()
+    (b, g, s, a)=populate(request)
 
     message = 'It has been loaded ' + str(b) + ' books; ' + str(g) + ' genres; ' + str(s) + ' settings; ' + str(a) + ' authors.'
     return render(request, 'base_POPULATEDB.html', {'title': 'End of database load', 'message':message})
@@ -111,7 +111,8 @@ def webhook(request):
     print(request.session)
     req = json.loads(request.body)
     if 'session' in req:
-        session_id = req['session'].split("dfMessenger-")[1]
+        print(req['session'])
+        session_id = req['session'].split("/")[-1]
         print("Esta es la id:"+ session_id)
     else:
         session_id = str(uuid.uuid4())
@@ -124,6 +125,16 @@ def webhook(request):
         user_session = user_session[0]
     print("EL USER SESSION ES:"+str(user_session))
 
+    outputContexts = []
+    if 'outputContexts' in req['queryResult']:
+        outputContexts = req['queryResult']['outputContexts']
+    print(outputContexts)
+    print(len(outputContexts))
+    #get the name of first context:
+    if len(outputContexts)==1 and any("__system_counters__" in context['name'] for context in outputContexts):
+        response = is_lost(user_session)
+        return JsonResponse(response)
+
 
     intent = req['queryResult']['intent']['displayName']
     #get the entities from the request:
@@ -133,6 +144,8 @@ def webhook(request):
     response= {
         
     }
+    if intent == 'Welcome':
+        response = welcome(user_session)
     if intent == 'UserProvidesName':
         response = userProvidesName(parameters, user_session)
     if intent == 'UserProvidesUserAge':
@@ -169,6 +182,8 @@ def webhook(request):
         response = userProvidesDateRelevance(parameters, user_session)
     if intent == 'UserProvidesDateEmpty':
         response = userProvidesDateEmpty(user_session)
+    if intent == 'skip':
+        response = skip(user_session, outputContexts)
 
 
     

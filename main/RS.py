@@ -17,7 +17,8 @@ preferred_genres_by_age['36-70+']= Genre.objects.filter(Q(name__icontains='Myste
 
 def reset_scores(user_session):
     if user_session in dictScores:
-        dictScores[user_session].clear()
+        for book in Book.objects.all():
+            dictScores[user_session][book] = 0
     if user_session in dictMatching:
         dictMatching[user_session].clear()
         

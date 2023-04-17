@@ -5,9 +5,10 @@ import re
 from main.models import Author, Book, Genre, Setting
 
 
-def populate():
-    (b, g, s, a)=populateBooks()
-    load_similar_books()
+def populate(request):
+    #get from the url that is /populate?books=1000 the number 1000:
+    number = int(request.GET.get("books"))
+    (b, g, s, a)=populateBooks(number)
     return (b,g,s, a)
 
 def add_many_to_many(item_id, list_of_items, items_set, cls):
@@ -24,7 +25,7 @@ def add_many_to_many(item_id, list_of_items, items_set, cls):
         items.append(itemToAdd)
     return items, item_id
 
-def populateBooks():
+def populateBooks(number):
     Book.objects.all().delete()
     Genre.objects.all().delete()
     Setting.objects.all().delete()
@@ -44,7 +45,7 @@ def populateBooks():
             next(reader)
             book_id=0
             for row in reader:
-                if book_id<1000:
+                if book_id<number:
                     title = row[1].strip()
                     series = row[2].strip()
                     #Do not store books that are not first in a series. It has no sense to recommend them
@@ -80,9 +81,6 @@ def populateBooks():
 
     except FileNotFoundError:
         print("File does not exist")
-        return (0,0,0)
+        return (0,0,0, 0)
 
-def load_similar_books():
-    #don't know if it will be efficient to calculate similarities between books
-    pass
 
