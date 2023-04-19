@@ -39,6 +39,12 @@ def getResultsResponse(user_session):
                             ]
                         ]
                     }
+                },
+                {
+                "text": {
+                    "text": ["Great! That's everything I need. I just travelled through Narnia, the Seven Kingdoms and even the whole Cosmere looking for the perfect books for you... This is what I found! http://recobook.pythonanywhere.com/results/"+str(user_session.session_id)],
+                },
+                "platform": "TELEGRAM"
                 }
         ]
     }
@@ -490,11 +496,21 @@ def skip(user_session, outputContexts):
                 }
             }]
         }
-    else:
+    elif any('userprovidesagecontext' in context['name'] for context in outputContexts):
         response = {
             "fulfillmentText": "Good. Now, my favourite question: what genres would you want your next read to have? You can say more than one If you want, or just tell type 'skip' if you don't care about genres.",
             "outputContexts": [{
                 "name": 'projects/william-qxgh/agent/sessions/'+user_session.session_id+'/contexts/UserProvidesGenresContext',
+                "lifespanCount": 5, 
+                "parameters": {
+                }
+            }]
+        }
+    else:
+        response = {
+            "fulfillmentText": "Cool, let's start with the questions that will help me find you a new book to read. How old are you? If you don't want your age to be relevant in the recommendation, pleasy type 'skip'",
+            "outputContexts": [{
+                "name": 'projects/william-qxgh/agent/sessions/'+user_session.session_id+'/contexts/UserProvidesAgeContext',
                 "lifespanCount": 5, 
                 "parameters": {
                 }

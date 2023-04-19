@@ -34,24 +34,40 @@
         <li>
             <h2 class="question">How does Recobook work?</h2>
             <p>Recobook is a Dialogflow agent that use Natural Language Processing to understand what user says and process it to data.
-                 Recobook catch your reading preferences and throw that information to a Recommendation System with
+                 Recobook catchs your reading preferences and throw that information to a Recommendation System with
                   constraint-based recommendation, which calculates a score for every single book in Data Base based in your preferences.</p>
         </li>
         <li>
+            <h2 class="question">How is Recobook different from the Recommendation Systems from webs like Amazon or GoodReads?</h2>
+            <p>Most Recommendation Systems try to find similarity betweeen books you liked and other books. They can also find similarity
+                between you and other profiles, and then recommend you books that people like you enjoyed. However, you can not "tell" those
+                systems what you want to read. With Recobook, you can just tell him to find you a mystery book, with no more than 200 pages,
+                similar to that book you read from that author and with your favorite city as the setting of the plot. And just by talking to Recobook!
+                It is really that easy.
+            </p>
+        </li>
+        <li>
             <h2 class="question">How can I use Recobook?</h2>
-            <p>To use Recobook, you just have you respond our chatbot questions as he suggest you to do. For every parameter that
-                Recobook can scrore for you, it will first ask you for a particular value for that parameter. For example, for genres it
-                will ask you what genres would you want your next read to have. In this type of questions, you can always say you don't 
-                mind about this parameter in your book recommendation. However, be sure of always specify what parameter you are not interested
-                in. For example, for genres you could answer "I'm not interested in <strong>genres</strong>". The, if you are actually
-                interested in that parameter, the chatbot will ask you a relevance number, which must be an integer from 1 to 10. that
-                relevance will be important to add more or less scrore to book that accomplish your parameter preference.
-                At the end of the conversation, Recobook will provide you a link with your recommendation results. I hope you enjoy it!
+            <p>Reobook is a totally free chatbot. To use Recobook, you just have to respond our chatbot questions as he suggest you to do. For every parameter that
+                Recobook can scrore for you (genres, number of pages...), it will first ask you for a particular value for that parameter. For example, for genres it
+                will ask you what genres would you want your next read to have. In this type of questions, you can always skip those questions
+                if you don't care about a question's parameter just typing "skip". For example, if you are not looking for a particular
+                genre, when the chatbot asks you about genres, just type "skip" and it will ask you about something else! Then, whenever you are actually
+                interested and answer a question, the chatbot will ask you a relevance number for that parameter, which must be an integer from 1 to 10. That
+                relevance will be important to add more or less scrore to books that accomplish your parameter preference. For example, if you want
+                for sure a mystery book, give a 10 to genres relevance. And if you want a book with less than 400 pages but that's not a must have, give pages relevance a 3.
+                At the end of the conversation, Recobook will provide you your recommendation results. I hope you enjoy it!
+            </p>
+        </li>
+        <li>
+            <h2 class="question">How can I add RecoBook to Telegram?</h2>
+            <p>If you want to chat with Recobook as if you were chating with a friend in Telegram, just look for @recobookbot 
+                in Telegram and start chatting with him!
             </p>
         </li>
         <li>
             <h2 class="question">What books can Recobook recommend me?</h2>
-            <p>Recobook load books in database from GoodRead's Best Book Ever bookshelf. Books are loaded by a DataSet
+            <p>Recobook loads books in database from GoodRead's Best Book Ever bookshelf. Books are loaded by a DataSet
                  from Lorena Casanova Lozano and Sergio Costa Planells that can be found in next link:</p>
             <a href="https://zenodo.org/record/4265096#.ZCL4tfZBxPZ">GoodRead's Best Books Ever Dataset</a>
     </ul>
