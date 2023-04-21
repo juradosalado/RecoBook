@@ -1,7 +1,6 @@
 from django.test import TestCase
 from main.models import *
 from main.RS import *
-# Create your tests here.
 
 class RecommendationSystemTestCase(TestCase):
     def setUp(self):

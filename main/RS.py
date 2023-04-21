@@ -139,7 +139,6 @@ def add_similar_authors_score(user_session):
     all_similar_authors = []
     authors_list = [author for author in authors]
     for author in authors:
-        print(author)
         url = base_url+author.name.replace(' ','+')
         f = urlopen(url)
         s=BeautifulSoup(f, "html.parser")
@@ -151,7 +150,6 @@ def add_similar_authors_score(user_session):
             similar_authors_names.append(similar_author)
             i+=1
         similar_authors = Author.objects.filter(name__in=similar_authors_names)
-        print(similar_authors)
         all_similar_authors.append(similar_authors)
     for book in books:
         i=0

@@ -6,7 +6,6 @@ from main.models import Author, Book, Genre, Setting
 
 
 def populate(request):
-    #get from the url that is /populate?books=1000 the number 1000:
     number = int(request.GET.get("books"))
     (b, g, s, a)=populateBooks(number)
     return (b,g,s, a)
@@ -20,7 +19,6 @@ def add_many_to_many(item_id, list_of_items, items_set, cls):
             itemToAdd.save()
             item_id +=1
         else:
-            print(item.strip())
             itemToAdd=cls.objects.filter(name=item.strip()).first()
         items.append(itemToAdd)
     return items, item_id
@@ -48,7 +46,6 @@ def populateBooks(number):
                 if book_id<number:
                     title = row[1].strip()
                     series = row[2].strip()
-                    #Do not store books that are not first in a series. It has no sense to recommend them
                     if "#" in series and "#1" not in series:
                         continue
                     average_rating = float(row[4].strip())
@@ -80,7 +77,6 @@ def populateBooks(number):
             return (Book.objects.count(), Genre.objects.count(), Setting.objects.count(), Author.objects.count())
 
     except FileNotFoundError:
-        print("File does not exist")
         return (0,0,0, 0)
 
 
