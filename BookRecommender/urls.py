@@ -22,7 +22,6 @@ urlpatterns = [
     path('',views.index),
     path('chatbot/', views.chatbot),
     path("populate/", views.populateDatabase),
-    path("recommend/", views.recommend),
     path('webhook/', views.webhook, name='webhook'),
     path('results/<str:session_id>/', views.showResults, name='results'),
     path('details/<int:id>/', views.details, name='details'),
