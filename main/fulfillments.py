@@ -27,7 +27,7 @@ def getResultsResponse(user_session):
                                 "type": "chevron_right",
                                 "color": "#FF9800"
                                 },
-                                "link": "http://localhost:8000/results/"+str(user_session.session_id),
+                                "link": "http://recobook.pythonanywhere.com/results/"+str(user_session.session_id),
                                 "text": "Check Results",
                                 "event": {
                                 "languageCode": "en",
@@ -49,12 +49,16 @@ def getResultsResponse(user_session):
         ]
     }
 
-def isRelevanceValid(relevance, user_session):
+def isRelevanceValid(relevance, user_session, context):
     if int(relevance) <=0 or int(relevance) >10:
-        response={
-            'fulfillmentText': "Oops. I need your relevance degree to be a number between 1 and 10. Please, respond with a number between 1 and 10",
-            'session': user_session.session_id
-
+        response = {
+            "fulfillmentText": "Oops. I need your relevance degree to be a number between 1 and 10. Please, respond with a number between 1 and 10",
+            "outputContexts": [{
+                "name": 'projects/william-qxgh/agent/sessions/'+user_session.session_id+'/contexts'+context,
+                "lifespanCount": 5, 
+                "parameters": {
+                }
+            }]
         }
         return False, response
     else:
@@ -101,7 +105,7 @@ def userProvidesName(parameters, user_session):
     name = parameters['person']['name']
     user_session.name = name
     user_session.save()
-    text = "Nice to meet you, " +name+"! Let's start with the questions that will help me find you a new book to read. How old are you? It is important for you to know that, for every question I ask you, you do not have to answer me if you don't want to, or just don't care about it. In that case, just let me know by saying: 'I don't care about my age'."
+    text = "Nice to meet you, " +name+"! Let's start with the questions that will help me find you a new book to read. How old are you? If you don't want your age to be relevant in the recommendation, pleasy type 'skip'."
     response = {
             'fulfillmentText': text,
             'session': user_session.session_id
@@ -123,7 +127,7 @@ def userProvidesUserAge(parameters, user_session):
 
 def userProvidesUserAgeRelevance(parameters, user_session, intent):
     relevance = parameters['number-integer']
-    isRelValid, response = isRelevanceValid(relevance, user_session)
+    isRelValid, response = isRelevanceValid(relevance, user_session, 'UserProvidesAgeRelevanceContext')
     if not isRelValid:
         return response
     session_id = user_session.session_id
@@ -154,7 +158,7 @@ def userProvidesGenres(parameters, user_session):
 def userProvidesGenresRelevance(parameters, user_session):
     session_id = user_session.session_id
     relevance = parameters['number-integer']
-    isRelValid, response = isRelevanceValid(relevance, user_session)
+    isRelValid, response = isRelevanceValid(relevance, user_session, 'UserProvidesGenresRelevanceContext')
     if not isRelValid:
         return response
     user_session = UserSession.objects.get(session_id=session_id)
@@ -193,7 +197,7 @@ def userProvidesAuthor(parameters, user_session):
 def userProvidesAuthorRelevance(parameters, user_session):
     session_id = user_session.session_id
     relevance = parameters['number-integer']
-    isRelValid, response = isRelevanceValid(relevance, user_session)
+    isRelValid, response = isRelevanceValid(relevance, user_session, 'UserProvidesAuthorRelevanceContext')
     if not isRelValid:
         return response
     user_session = UserSession.objects.get(session_id=session_id)
@@ -234,7 +238,7 @@ def userProvidesSimilarAuthors(parameters, user_session):
 def userProvidesSimilarAuthorsRelevance(parameters, user_session):
     session_id = user_session.session_id
     relevance = parameters['number-integer']
-    isRelValid, response = isRelevanceValid(relevance, user_session)
+    isRelValid, response = isRelevanceValid(relevance, user_session, 'UserProvidesSimilarAuthorsRelevanceContext')
     if not isRelValid:
         return response
     user_session = UserSession.objects.get(session_id=session_id)
@@ -272,7 +276,7 @@ def userProvidesSettings(parameters, user_session):
 def userProvidesSettingsRelevance(parameters, user_session):
     session_id = user_session.session_id
     relevance = parameters['number-integer']
-    isRelValid, response = isRelevanceValid(relevance, user_session)
+    isRelValid, response = isRelevanceValid(relevance, user_session, 'UserProvidesSettingsRelevanceContext')
     if not isRelValid:
         return response
     user_session = UserSession.objects.get(session_id=session_id)
@@ -305,7 +309,7 @@ def userProvidesPages(parameters, user_session):
 def userProvidesPagesRelevance(parameters, user_session):
     session_id = user_session.session_id
     relevance = parameters['number-integer']
-    isRelValid, response = isRelevanceValid(relevance, user_session)
+    isRelValid, response = isRelevanceValid(relevance, user_session, 'UserProvidesPagesRelevanceContext')
     if not isRelValid:
         return response
     waiting = user_session.is_waiting
@@ -337,7 +341,7 @@ def userProvidesRate(parameters, user_session):
 def userProvidesRateRelevance(parameters, user_session):
     session_id = user_session.session_id
     relevance = parameters['number-integer']
-    isRelValid, response = isRelevanceValid(relevance, user_session)
+    isRelValid, response = isRelevanceValid(relevance, user_session, 'UserProvidesRateRelevanceContext')
     if not isRelValid:
         return response
     waiting = user_session.is_waiting
@@ -372,7 +376,7 @@ def userProvidesDate(parameters, user_session):
 def userProvidesDateRelevance(parameters, user_session):
     session_id = user_session.session_id
     relevance = parameters['number-integer']
-    isRelValid, response = isRelevanceValid(relevance, user_session)
+    isRelValid, response = isRelevanceValid(relevance, user_session, 'UserProvidesDateRelevanceContext')
     if not isRelValid:
         return response
     waiting = user_session.is_waiting

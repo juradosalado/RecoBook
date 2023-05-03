@@ -95,7 +95,6 @@ def webhook(request):
         response = is_lost(user_session)
         return JsonResponse(response)
 
-
     intent = req['queryResult']['intent']['displayName']
     parameters = req['queryResult']['parameters']
     response= {
