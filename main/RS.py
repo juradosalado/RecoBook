@@ -74,8 +74,9 @@ def add_age_score(user_session):
         if age <= 18:
             aux_add_age_score(user_session, book, age_relevance, matching_text, '0-18')
             #It tries not to recommend long books to young kids
-            if age<=13 and book.pages_number>300:
-                dictScores[user_session][book] -= age_relevance / 2
+            if book.pages_number:
+                if age<=13 and book.pages_number>300:
+                    dictScores[user_session][book] -= age_relevance / 2
 
         elif age <= 35:
             aux_add_age_score(user_session, book, age_relevance, matching_text, '18-35')

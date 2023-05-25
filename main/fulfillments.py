@@ -27,7 +27,7 @@ def getResultsResponse(user_session):
                                 "type": "chevron_right",
                                 "color": "#FF9800"
                                 },
-                                "link": "http://recobook.pythonanywhere.com/results/"+str(user_session.session_id),
+                                "link": "http://localhost:8000/results/"+str(user_session.session_id),
                                 "text": "Check Results",
                                 "event": {
                                 "languageCode": "en",
@@ -42,7 +42,7 @@ def getResultsResponse(user_session):
                 },
                 {
                 "text": {
-                    "text": ["Great! That's everything I need. I just travelled through Narnia, the Seven Kingdoms and even the whole Cosmere looking for the perfect books for you... This is what I found! http://recobook.pythonanywhere.com/results/"+str(user_session.session_id)],
+                    "text": ["Great! That's everything I need. I just travelled through Narnia, the Seven Kingdoms and even the whole Cosmere looking for the perfect books for you... This is what I found! http://localhost:8000/results/"+str(user_session.session_id)],
                 },
                 "platform": "TELEGRAM"
                 }
@@ -53,12 +53,6 @@ def isRelevanceValid(relevance, user_session, context):
     if int(relevance) <=0 or int(relevance) >10:
         response = {
             "fulfillmentText": "Oops. I need your relevance degree to be a number between 1 and 10. Please, respond with a number between 1 and 10",
-            "outputContexts": [{
-                "name": 'projects/william-qxgh/agent/sessions/'+user_session.session_id+'/contexts'+context,
-                "lifespanCount": 5, 
-                "parameters": {
-                }
-            }]
         }
         return False, response
     else:
@@ -139,7 +133,6 @@ def userProvidesUserAgeRelevance(parameters, user_session, intent):
     response = {
         'session': session_id
     }
-    dict_ordered = dict(list(sorted(dictScores[user_session].items(), key=lambda item: (-item[1], -item[0].average_rating, item[0].num_ratings)))[:20])
     return response
 
 def userProvidesGenres(parameters, user_session):
