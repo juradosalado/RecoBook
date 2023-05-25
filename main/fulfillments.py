@@ -411,7 +411,7 @@ def skip(user_session, outputContexts):
         }
     elif any('userprovidespagescontext' in context['name'] for context in outputContexts):
         response = {
-            "fulfillmentText": "Great! We're almost done. Now, it's time for people to judge! What would be the minimum rate, from 1 to 5, that you would want your next read to have in the social network GoodReads? You can say a decimal number, of course.",
+            "fulfillmentText": "Great! We're almost done. Now, it's time for people to judge! What would be the minimum rate, from 1 to 5, that you would want your next read to have in the social network GoodReads?",
             "outputContexts": [{
                 "name": 'projects/william-qxgh/agent/sessions/'+user_session.session_id+'/contexts/UserProvidesRateContext',
                 "lifespanCount": 5, 
@@ -461,7 +461,7 @@ def skip(user_session, outputContexts):
         }
     elif any('userprovidesagecontext' in context['name'] for context in outputContexts):
         response = {
-            "fulfillmentText": "Good. Now, my favourite question: what genres would you want your next read to have? You can say more than one If you want, or just tell type 'skip' if you don't care about genres.",
+            "fulfillmentText": "Good. Now, my favourite question: what genres would you want your next read to have? You can say more than one If you want, or just type 'skip' if you don't care about genres.",
             "outputContexts": [{
                 "name": 'projects/william-qxgh/agent/sessions/'+user_session.session_id+'/contexts/UserProvidesGenresContext',
                 "lifespanCount": 5, 

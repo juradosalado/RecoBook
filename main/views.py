@@ -22,7 +22,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 def deleteOldUserSessions():
-    OldUserSessions= UserSession.objects.filter(date_last_used__lt=datetime.now()-timedelta(days=1))
+    OldUserSessions= UserSession.objects.filter(date_last_used__lt=timezone.now()-timedelta(days=1))
     for oldusersession in OldUserSessions:
         if oldusersession in dictScores:
             del dictScores[oldusersession]
@@ -144,11 +144,5 @@ def webhook(request):
 
 
 
-#TODO:
-#Refactorizar
-#unificar atributos: rate, rating y demas
-
-#No se puede controlar que el rating no salga de 1 a 5, y el pages relevance, porque entra en los otros contextos.HAy que sacar
-#la forma de hacer set del contexto con fulfillment y que SOLO tenga ese contexto.
 
 
