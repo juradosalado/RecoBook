@@ -58,15 +58,15 @@ class RecommendationSystemTestCase(TestCase):
             genres_relevance=10,
             author_name = "Jon Denbrough",
             author_relevance = 2,
-            similar_authors_relevance = 2,
-            settings_relevance = 2,
+            similar_authors_relevance = 7,
+            settings_relevance = 5,
             pages_number = 500,
-            pages_number_relevance = 2,
+            pages_number_relevance = 1,
             rating = 4,
             rating_relevance = 3,
             date_after = datetime.date(2010, 4, 7),
             date_before = datetime.date(2015, 4, 7),
-            date_relevance = 2
+            date_relevance = 8
         )
         Book.objects.get(book_id=1).authors.add(Author.objects.get(author_id=1))
         Book.objects.get(book_id=2).authors.add(Author.objects.get(author_id=2))
